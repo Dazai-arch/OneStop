@@ -7,43 +7,30 @@ const path = require("path");
 const dotenv = require("dotenv");
 const bcrypt = require("bcryptjs");
 const nodemailer = require("nodemailer");
-const crypto = require("crypto");
-const session = require("express-session");
-const MongoStore = require("connect-mongo");
+const session = require("express-session"); // Import express-session
 
 dotenv.config();
 const app = express();
 const port = 3000;
 
+app.use(cors());
+app.use(bodyParser.json());
+app.use(express.static(path.join(__dirname, "./frontend")));
+app.use(express.static(path.join(__dirname, "./Profileimage")));
+app.use(express.static(path.join(__dirname, "./assets")));
+
+// Set up session middleware
 app.use(
-  cors({
-    origin: "http://127.0.0.1:5500",
-    credentials: true,
+  session({
+    secret: "your-secret-key", // Use a strong secret key
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false }, // Set 'secure: true' if using HTTPS
   })
 );
-app.use(bodyParser.json());
-// app.use(express.static(path.join(__dirname, "./frontend")));
-// app.use(express.static(path.join(__dirname, "./Profileimage")));
 
 const mongoURI = process.env.MONGO_URI;
 const dbNAME = process.env.DB_NAME;
-
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET,
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "none",
-      maxAge: 24 * 60 * 60 * 1000, // 1 day
-    },
-    store: new MongoStore({
-      mongoUrl: mongoURI,
-      collectionName: "sessions",
-    }),
-  })
-);
 
 mongoose
   .connect(mongoURI, {
@@ -68,6 +55,10 @@ const userSchema = new mongoose.Schema({
 
 const User = mongoose.model("User", userSchema);
 
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "./frontend/html/signup.html"));
+});
+
 app.post("/signup", async (req, res) => {
   const { email, username, designation, phone, password } = req.body;
 
@@ -91,14 +82,11 @@ app.post("/signup", async (req, res) => {
       password: hashedPassword,
     });
 
-    await newUser.save();
-    const userId = newUser._id;
-    req.session.userId = userId;
-    console.log("User ID in session after signup:", req.session.userId);
-    console.log("Session after signup:", req.session); // Log session
-    console.log(
-      `New user signed up: Email: ${email}, Username: ${username}, Session ID: ${req.session.id}`
-    );
+    const savedUser = await newUser.save();
+    console.log(`New user signed up: Email: ${email}, Username: ${username}`);
+
+    // Store the user ID in the session
+    req.session.userId = savedUser._id;
 
     res.status(201).json({ message: "Signup successful!" });
   } catch (error) {
@@ -109,10 +97,10 @@ app.post("/signup", async (req, res) => {
 
 app.post("/save-profile-image", async (req, res) => {
   const { imagePath } = req.body;
-  console.log("Full session data:", req.session);
-  const userId = req.session.userId; // Assuming userId is stored in session after login/signup
-  console.log("Session ID:", req.session.id);
-  console.log("User ID in session:", userId);
+
+  // Get user ID from the session
+  const userId = req.session.userId;
+
   if (!userId) {
     return res.status(401).json({ message: "Unauthorized" });
   }
@@ -126,10 +114,10 @@ app.post("/save-profile-image", async (req, res) => {
     await User.findByIdAndUpdate(userId, { image: imagePath });
 
     console.log(
-      `Profile image updated for user: ${userId}, Image path: ${imagePath}`
+      `Profile image updated for user ID: ${userId}, Image path: ${imagePath}`
     );
 
-    res.status(200).json({ message: "Profile image saved successfully!" });
+    res.status(200).json({ message: "Profile image saved!" });
   } catch (error) {
     console.error("Error saving profile image:", error);
     res.status(500).json({ message: "Failed to save profile image" });
@@ -158,8 +146,10 @@ app.post("/login", async (req, res) => {
       return res.status(401).json({ message: "Invalid email or password." });
     }
 
+    // Store the user ID in the session after login
     req.session.userId = user._id;
-    console.log(`User logged in: ${email}, Session ID: ${req.session.id}`);
+
+    console.log(`User logged in: ${email}`);
     res.status(200).json({ message: "Login successful.", userId: user._id });
   } catch (error) {
     console.error("Error during login:", error);
@@ -246,16 +236,6 @@ app.post("/reset-password", async (req, res) => {
     res.json({ message: "Password reset successfully!" });
   } catch (error) {
     res.status(500).json({ message: "Error resetting password." });
-  }
-});
-
-app.get("/check-session", (req, res) => {
-  console.log("Session ID:", req.session.id); // Log session ID
-  console.log("Session data:", req.session);
-  if (req.session.userId) {
-    res.json({ loggedIn: true, userId: req.session.userId });
-  } else {
-    res.status(401).json({ loggedIn: false });
   }
 });
 

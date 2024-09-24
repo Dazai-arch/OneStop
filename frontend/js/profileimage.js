@@ -1,26 +1,4 @@
-document.addEventListener("DOMContentLoaded", async () => {
-  await checkSession(); // Call the function to check session validity
-});
-
-async function checkSession() {
-  try {
-    const response = await fetch("http://localhost:3000/check-session", {
-      method: "GET",
-      credentials: "include",
-    });
-
-    const result = await response.json();
-    if (response.ok) {
-      console.log("User is logged in:", result);
-      // Proceed with your logic
-    } else {
-      console.log("User is not logged in.");
-      // Redirect to login or show an error
-    }
-  } catch (error) {
-    console.error("Error checking session:", error);
-  }
-}
+document.addEventListener("DOMContentLoaded", () => {});
 
 let selectedImagePath = "";
 
@@ -46,13 +24,12 @@ document.getElementById("submit").addEventListener("click", function () {
   }
 
   // Send the selected image path to the server
-  fetch("http://localhost:3000/save-profile-image", {
+  fetch("/save-profile-image", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    credentials: "include",
-    body: JSON.stringify({ imagePath: selectedImagePath }),
+    body: JSON.stringify({ imagePath: selectedImagePath }), // Send selected image path to the server
   })
     .then((response) => {
       if (!response.ok) {
@@ -61,9 +38,9 @@ document.getElementById("submit").addEventListener("click", function () {
       return response.json();
     })
     .then((data) => {
-      if (data.message === "Profile image saved successfully!") {
+      if (data.message === "Profile image saved!") {
         alert("Profile image saved successfully!");
-        window.location.href = "./login.html"; // Redirect to login page after saving
+        window.location.href = "/html/login.html"; // Redirect to login page after saving
       } else {
         alert("Error saving profile image!");
       }
