@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OneStop-Signup</title>
+    <link rel="stylesheet" href="../css/signup.css" type="text/css">
+</head>
+<body>
+        <div class="logo">
+            <img src="/assets/OneSTOPlogo.png" alt="Onestoplogo" id="logo">
+        </div>
+        <div class="banner">
+            <img src="/assets/login-signupbanner.png" alt="Onestopbanner" id="lsbanner">
+        </div>
+
+    <div class="main">
+        <main id="card">
+            <div class="maindiv">
+                <div class="sign">
+                    <h1 id="head">Sign Up</h1>
+                </div>
+        
+                <form action="#" onsubmit="return validateForm(event)">
+                    <div class="siform">
+                        <label for="email"></label>
+                        <input type="email" name="email" id="email" placeholder="Email" autocomplete="email"/>
+                        <p id="err1"></p>
+                        <input id="username" type="text" name="username" placeholder="Username" autocomplete="username" />
+                        <p id="err2"></p>
+                        <input id="designation" type="text" name="designation" placeholder="Designation" autocomplete="off"/>
+                        <p id="err3"></p>
+                        <input id="phoneno" type="tel" name="phoneno" placeholder="Phone Number" autocomplete="tel"/>
+                        <p id="err4"></p>
+                        <input id="password" type="password" name="password" placeholder="Password required" autocomplete="new-password" required/>
+                        <p id="err5"></p>
+                    </div>
+                        <div class="button">
+                            <button type="submit" class="sub">Submit</button>                        
+                        </div>
+                    </div>
+                </form>
+                <form action="login.html" id="form">
+                    <div class="button">
+                        <button class="log">Log In</button>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+    <script src="../js/signup.js"></script>
+</body>
+</html> 

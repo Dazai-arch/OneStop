@@ -1,0 +1,61 @@
+body{
+    margin: 0;
+}
+
+#logo{
+    width: 70px;
+    height: 90px;
+}
+.heading{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+h1{
+    font-family:'Arial', sans-serif;
+    font-weight: 200;
+}
+.section{
+    display: flex;
+    gap: 5em;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+    height: 400px;
+}
+.section img{
+    height: 150px;
+    width: 150px;
+    border: solid white 2px;
+    transition: border 0.3s ease;
+    border-radius: 50px;
+}
+
+.section img:hover {
+    border: solid black 3px;
+}
+
+.section img.selected {
+    border: solid black 5px;
+}
+.selection{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+#submit{
+    width: 200px;
+    justify-content: center;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    border: black solid 1px;
+    height: 30px;
+}
+button{
+    background-color: #ffffff;
+}
+button:hover{
+    background-color: black;
+    color: #ffffff;
+    border-radius: 50px;
+    border: white solid 1px;
+}

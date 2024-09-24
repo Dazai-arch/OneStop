@@ -1,0 +1,249 @@
+body{
+    background-color: #F7F7F7;
+    margin: 0;
+}
+h1{
+    position: absolute;
+    margin-left: auto;
+    margin-right: auto;
+    font-size: 25px;
+}
+#t{
+    color: rgb(255, 82, 82);
+}
+a{
+    text-decoration: none;
+    color: white;
+}
+button{
+    background-color: #484545;
+    border: 0;
+    height: 2em;
+    width: 8em;
+    padding: 7px 32px;        
+    border-radius: 100px;
+    color: #ffffff;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: medium;
+    outline: none;
+    margin: 10px;
+
+}
+.button-container{
+    right: 0;
+    position: absolute;
+}
+
+button:hover{
+    background-color: black;
+    color: #F7F7F7;
+}
+
+
+
+.carousel-container {
+    position: absolute;
+    top: 17%;
+    left: 0;
+    width: 100%;
+    overflow: hidden;
+    right: 0; /* Hide the overflow */
+}
+ul{
+    padding: 0;
+}
+
+.carousel {
+    display: inline-block;
+    
+    animation: scroll 15s linear infinite;
+}
+
+.carousel-container:hover .carousel{
+    animation-play-state: paused;
+}
+.mainlist {
+    display: flex;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    flex-shrink: 0; /* Prevent items from shrinking */
+    width: 14%; /* Each item takes 20% of the container width */
+}
+
+.banner {
+    margin-bottom: 10px;
+}
+
+.image {
+    max-width: 100px; /* Adjust size of the image as needed */
+    height: auto;
+}
+
+.text {
+    font-size: 16px;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-weight: bold;
+}
+
+/* Keyframes for infinite scrolling */
+@keyframes scroll {
+    from {
+        transform: translateX(0);
+    }
+    to {
+        transform: translateX(-100%);
+    }
+}
+
+
+.head{
+    position: absolute;
+    text-align: center; 
+    top: 35%;
+    left: 50%; 
+    transform: translateX(-50%);
+    font-size: 30px; /* Adjust font size as needed */
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-weight: bold;
+    white-space: nowrap;
+}
+#something{
+    display: inline;
+}
+
+.madiv{
+    display: flex;
+}
+.header{
+    display: inline-flex;
+    flex-direction: row;
+    position: relative;
+    gap: 70px;
+    left: 15%;
+    padding-top: 20px;
+}
+.anch{
+    text-decoration: none;
+    color: black;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 18px;
+    font-weight:100;
+}
+
+
+
+.detail {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 70px; 
+    padding-top: 25%;
+}
+
+.det {
+    flex: 1;
+    text-align: center;
+}
+
+.ima {
+    flex: 1;
+    display: flex;
+    justify-content: center; 
+}
+
+
+
+.imag{
+    height: 400px;
+    width: 600px;
+    box-shadow: 0px 4px 8px #484545;
+}
+
+.textt{
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 45px;
+}
+.task{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 70px; 
+    padding-top: 5%;
+}
+.collaborator{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 70px; 
+    padding-top: 5%;
+}
+.project{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 70px; 
+    padding-top: 5%;
+}
+.idea{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 70px; 
+        padding-top: 5%;
+}
+
+footer{
+    background-color: black;
+    height: 30px;
+    margin-top: 5%;
+}
+.foot{
+    padding-top: 0.5%;
+    color: white;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: medium;
+    text-align: center;
+    margin: 0;
+}
+
+@media (max-width: 1200px) {
+    h1{
+        font-size: 20px;
+    }
+    .header {
+        gap: 20px;
+        left: 15%;
+        padding-top: 12px;
+    }
+    button{
+        height: 2em;
+        width: 8em;
+        padding: 7px 32px;        
+        font-size: 15px;
+        margin: 5px;
+    }
+    .head {
+        top: 35%;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 16px;
+    }
+    .textt{
+        font-size: 25px;
+    }
+    .imag{
+        height: 300px;
+        width: 400px;
+    }
+    .detail{
+        padding-top: 35%
+    }
+}

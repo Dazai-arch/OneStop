@@ -1,0 +1,161 @@
+#logo{
+    width: 70px;
+    height: 90px;
+}
+.logo{
+    display: inline-block; 
+    width: fit-content; 
+    height: fit-content;
+}
+#lsbanner{
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 100%;
+    width: 50%;
+}
+body{
+    margin: 0;
+ 
+    height: 100vh;
+}
+#card{
+    padding: 64px;
+    display: flex;
+    width: 400px;
+    max-width: 100%;
+    height: 400px;
+    flex-direction: column;
+    gap: 16px;
+    background: #F7F7F7;
+    border-radius: 78px;
+    overflow: hidden;
+    left: 10%;
+    position: relative;
+}
+#head{
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    text-align: center;
+}
+
+input{
+    border: none;
+    outline: 0;
+    width: 309px;
+    height: 32px;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    padding-left: 5px;
+    outline: 0;
+    border: #ffffff solid 2px;
+}
+input:hover{
+    border: black solid 2px;
+    color: black;
+    background-color: #ffffff;
+    
+}
+input:hover::placeholder {
+    color: black;
+}
+.siform{
+    display: flex;
+    flex-direction: column;
+    padding-left: 11%;
+    padding-top: 7%;
+}
+.sub{
+    width: 250px;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    border: black solid 1px;
+    border-radius: 16px;
+    height: 30px;
+}
+.button{
+    position: relative;
+    display: grid;
+    justify-content: center;
+    gap: 10em;
+    padding-top: 15px;
+}
+.log{
+    width: 250px;
+    justify-content: center;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    border: black solid 1px;
+    border-radius: 48px;
+    height: 30px;
+}
+button{
+    background-color: #ffffff;
+}
+button:hover{
+    background-color: black;
+    color: #ffffff;
+    border: white solid 1px;
+}
+.forgot{
+    margin: 0%;
+    text-align: right;
+    padding-right: 37px;
+    padding-top: 0;
+    padding-bottom: 20px;
+}
+.fpass{
+    text-decoration: none;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+}
+
+.fpass:hover{
+    color: black;
+    text-decoration: underline;
+}
+
+@media (max-width: 1500px) {
+    input{
+        width: 250px;
+        height: 32px;
+        padding-left: 5px;
+    }    
+    .main{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    #card{
+        padding: 44px;
+        width: 300px;
+        height: 350px;
+        gap: 10px;
+        left: 3%;
+        margin-top: 50px;
+    }
+    #head{
+        font-size: 20px;
+    }
+    .sub{
+        width: 150px;
+        height: 30px;
+    }
+    .button{
+        gap: 7em;
+        padding-top: 5px;
+    }
+    .log {
+        width: 150px;
+        height: 30px;
+    }
+    .forgot{
+        text-align: right;
+        padding-right: 20px;
+        padding-bottom: 20px;
+    }
+    .fpass{
+        font-size: 15px;
+    }
+    #lsbanner{
+        height: 100%;
+        width: 100%;
+        opacity: 0.6;
+    }
+}
+

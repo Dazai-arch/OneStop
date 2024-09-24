@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OneStop - Verify Code</title>
+    <link rel="stylesheet" href="../css/forgot.css">
+</head>
+<body>
+    <img src="/assets/OneSTOPlogo.png" alt="onestop-logo" class="logo">
+    <div class="main">
+        <div id="verify">
+            <h1>Verify Code</h1>
+        </div>
+        <div class="head">
+            <h3>Enter the verification code sent to your email</h3>
+        </div>
+        <div id="mform">
+            <form id="verifyForm">
+                <input type="text" placeholder="Verification Code" id="code" required><br>
+                <button type="submit">Verify</button>
+            </form>
+        </div>
+        <div id="message"></div>
+    </div>
+
+    <script>
+        const email = localStorage.getItem('email');
+
+        document.getElementById('verifyForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const code = document.getElementById('code').value;
+
+            try {
+                const response = await fetch('http://localhost:3000/verify-reset-code', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, code }),
+                });
+
+                const result = await response.json();
+                document.getElementById('message').innerText = result.message;
+
+                if (result.success) {
+                    window.location.href = '../html/reset-password.html';
+                }
+            } catch (error) {
+                console.error('Error verifying code:', error);
+                document.getElementById('message').innerText = 'Error verifying code.';
+            }
+        });
+    </script>
+</body>
+</html>
