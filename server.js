@@ -7,7 +7,8 @@ const path = require("path");
 const dotenv = require("dotenv");
 const bcrypt = require("bcryptjs");
 const nodemailer = require("nodemailer");
-const session = require("express-session"); // Import express-session
+const session = require("express-session");
+const MongoStore = require("connect-mongo");
 
 dotenv.config();
 const app = express();
@@ -22,10 +23,15 @@ app.use(express.static(path.join(__dirname, "./assets")));
 // Set up session middleware
 app.use(
   session({
-    secret: "your-secret-key", // Use a strong secret key
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: true,
-    cookie: { secure: false }, // Set 'secure: true' if using HTTPS
+    store: MongoStore.create({
+      mongoUrl: process.env.MONGO_URI,
+      dbName: process.env.DB_NAME,
+      collectionName: "sessions",
+    }),
+    cookie: { secure: false, maxAge: 5 * 60 * 1000 },
   })
 );
 
