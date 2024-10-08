@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OneSTOP Dashboard</title>
+    <script src="https://cdn.socket.io/4.8.0/socket.io.min.js"></script>
+    <link rel="stylesheet" href="/css/board.css">
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo"><img src="/OneSTOPlogo.png"></div>
+
+        <button class="noselect" onclick="openPopup()">
+            <span class="text">Add</span>
+            <span class="icon"><span class="buttonSpan">+</span></span>
+        </button>
+
+        <div id="projectPopup" class="popup">
+            <div class="popup-content">
+                <span class="close" onclick="closePopup()">&times;</span>
+                <h2>Add New Project</h2>
+                <input type="text" id="newProjectName" placeholder="Enter Project Name">
+                <div class="addb" onclick="addProject()">Add Project</div>
+            </div>
+        </div>
+
+        <button class="login-signup-btn" id="logout-btn">Log Out</button>
+
+        <ul class="menu">
+            <li>
+                <img src="/dashboardpng.png" alt="Dashboard Icon" class="menu-icon">
+                <span><a href="/html/dashboard.html">Dashboard</a></span>
+            </li>
+            <li>
+                <img src="/projectspng.png" alt="Projects Icon" class="menu-icon">
+                <span><a href="/html/project.html">Projects</a></span>
+            </li>
+            <li>
+                <img src="/taskpng.png" alt="Tasks Icon" class="menu-icon">
+                <span><a href="/html/tasks.html">Tasks</a></span>
+            </li>
+            <li>
+                <img src="/ideaspng.png" alt="Ideas Icon" class="menu-icon">
+                <span><a href="">Ideas</a></span>
+            </li>
+            <li>
+                <img src="/collaboratorpng.png" alt="Collaborators Icon" class="menu-icon">
+                <span><a href="/html/collaborator.html">Collaborators</a></span>
+            </li>
+
+            <a href="/html/about.html"><img src="/image 11.png" alt="Bottom Image" class="bottom-image"></a>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        <div class="container">
+            <header>
+                <h1>Board</h1>
+
+                <div class="navbar">
+                    <a href="/html/project.html"><button class="tab">Projects</button></a>
+                    <a href="/html/ganttchart.html"><button class="tab">Gantt charts</button></a>
+                    <a href="tab active"><button class="tab active">Board</button></a>
+                    <a href="/html/resources.html"><button class="tab">Resources</button></a>
+                </div>
+            </header>
+
+            <div class="team-tag">
+                <div class="details">
+                    <h4 id="username"></h4>
+                    <p id="designation"></p>
+                </div>
+                <div class="avatar"><a href="/html/proffile.html">
+                    <img src="" alt="" id="profileimage"></a>
+                </div>
+            </div>
+
+            <main>
+                <div class="project-header">
+                    <span>Board Names</span>
+                </div>
+
+                <ul id="project-list" class="project-list"></ul>
+
+                <div class="board">
+                    <div class="column" id="new">
+                        <h2>New</h2>
+                        <div class="add-task"><img src="/image 28.png" alt="Add Task"></div>
+                    </div>
+                    <div class="column" id="planned">
+                        <h2>Planned</h2>
+                        <div class="add-task"><img src="/image 28.png" alt="Add Task"></div>
+                    </div>
+                    <div class="column" id="in-progress">
+                        <h2>In Progress</h2>
+                        <div class="add-task"><img src="/image 28.png" alt="Add Task"></div>
+                    </div>
+                    <div class="column" id="completed">
+                        <h2>Completed</h2>
+                        <div class="add-task"><img src="/image 28.png" alt="Add Task"></div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <div class="popup" id="taskPopup">
+        <div class="popup-content">
+            <h3>Edit Task</h3>
+            <input type="text" id="taskTitle" placeholder="Task Title">
+            <input type="text" id="assignee" placeholder="Assignee" />
+            <textarea id="taskDescription" placeholder="Task Description"></textarea>
+            <button id="saveTask">Save</button>
+            <button id="closePopup">Close</button>
+        </div>
+    </div>
+
+    <div class="popup" id="memberPopup">
+        <div class="popup-content">
+            <h3>Add Member</h3>
+            <input type="text" id="memberName" placeholder="Member Name">
+            <div class="b">
+                <button id="saveMember">Save</button>
+                <button id="closeMemberPopup">Close</button>
+            </div>
+        </div>
+    </div>
+    <script src="/js/addotherpage.js"></script>
+    <script>
+        const statusMapping = {
+            'new': 'New',
+            'planned': 'Planned',
+            'in-progress': 'In Progress',
+            'completed': 'Completed'
+        };
+        document.addEventListener('DOMContentLoaded', function() {
+            const socket = io();
+            socket.on('connect', () => {
+                console.log('Connected to Socket.IO server');
+            })
+            socket.on('taskUpdated', (updatedTask) => {
+                console.log("Task updated:", updatedTask);
+                updateTaskInUI(updatedTask); // Function to update the UI with the new task data
+            });
+        
+
+            function updateTaskInUI(updatedTask) {
+                // Find the task element in the DOM
+                const taskElement = document.querySelector(`.task[data-id='${updatedTask._id}']`);
+                if (taskElement) {
+                    // Update the task's properties in the UI
+                    taskElement.textContent = updatedTask.title;
+                    const statusElement = taskElement.querySelector('.task-status'); // Assuming you have a span for status
+        if (statusElement) {
+            statusElement.textContent = updatedTask.status; // Update the status text
+            // You may also want to apply styles based on the new status
+            statusElement.className = `task-status ${updatedTask.status.toLowerCase().replace(' ', '-')}`; // Update status class
+        } else {
+            console.warn("Status element not found for task:", updatedTask._id);
+        } // Update title
+                    // Update additional properties as needed
+                    // You might also want to update status, assignee, etc.
+                } else {
+                    console.warn("Task element not found in the UI.");
+                }
+            }
+
+
+            const columns = document.querySelectorAll('.column');
+            const addTaskButtons = document.querySelectorAll('.add-task');
+            const popup = document.getElementById('taskPopup');
+            const taskTitle = document.getElementById('taskTitle');
+            const assigneeInput = document.getElementById('assignee');
+            const taskDescription = document.getElementById('taskDescription');
+            const memberNameInput = document.getElementById('memberName'); // Ensure memberNameInput is defined
+            const memberPopup = document.getElementById('memberPopup'); // Ensure memberPopup is defined
+            let currentColumn = null;
+            let currentMemberTask = null;
+        
+            // Fetch profile data
+            fetch('/profile')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('username').textContent = data.username;
+                    document.getElementById('designation').textContent = data.designation;
+                    document.getElementById('profileimage').src = data.image;
+                })
+                .catch(error => console.error('Error fetching profile data:', error));
+            
+            // Fetch selected project from session
+            fetch('/api/get-selected-project')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        fetchTasks(data.projectId);
+                    } else {
+                        alert('No project selected.');
+                        window.location.href = '/html/project.html';
+                    }
+                })
+                .catch(error => console.error('Error fetching selected project:', error));
+        
+            // Fetch tasks
+            function fetchTasks() {
+                fetch('/api/tasks')  // No need to pass projectId
+                  .then(response => response.json())
+                  .then(tasks => {
+                    tasks.forEach(task => {
+                      addTaskToColumn(task, task.status);
+                    });
+                  })
+                  .catch(error => console.error("Error fetching tasks:", error));
+              }
+              
+            // Add task to column
+            
+            
+        
+            function dragStart(event) {
+                // Set the data to be transferred (task ID)
+                event.dataTransfer.setData('text/plain', event.target.dataset.id);
+                event.target.style.opacity = "0.5"; // Optional: visual feedback during dragging
+            }
+            
+            function dragOver(event) {
+                event.preventDefault(); // Necessary to allow dropping
+            }
+            
+            function drop(event) {
+                event.preventDefault();
+                
+                // Get the dragged task's ID
+                const taskId = event.dataTransfer.getData('text/plain');
+                
+                // Find the task element by its ID
+                const taskElement = document.querySelector(`.task[data-id='${taskId}']`);
+                
+                if (taskElement) {
+                    // Find the current column and insert the task before the add-task element
+                    this.querySelector('.add-task').before(taskElement);
+                    
+                    // Reset the opacity after dropping
+                    taskElement.style.opacity = "1";
+                    
+                    // Update the task's status based on the new column (the ID of the column is the new status)
+                    const newStatus = this.id; // 'new', 'planned', 'in-progress', or 'completed'
+                    updateTaskStatus(taskId, newStatus); // Call function to update the task's status in the backend
+                }
+            }
+            
+            function updateTaskStatus(taskId, status) {
+                // Make an API request to update the task status in the backend
+                fetch(`/api/tasks/${taskId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status })
+                }).then(response => {
+                    if (!response.ok) {
+                        throw new Error("Failed to update task status");
+                    }
+                    return response.json();
+                })
+                .then(updatedTask => {
+                    socket.emit('taskUpdated', updatedTask); // Emit updated task to other clients
+                })
+                .catch(error => {
+                    console.error("Error updating task status:", error);
+                });
+            }
+        
+            columns.forEach(column => {
+                column.addEventListener('dragover', dragOver);
+                column.addEventListener('drop', drop);
+            });
+        
+            // Handle adding a new task
+            addTaskButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    taskTitle.value = '';
+                    taskDescription.value = '';
+                    popup.style.display = 'flex';
+                    currentColumn = button.parentElement;
+                });
+            });
+        
+            document.getElementById('closePopup').addEventListener('click', function() {
+                popup.style.display = 'none';
+            });
+        
+            document.getElementById('saveTask').addEventListener('click', async function() {
+                const title = taskTitle.value.trim();
+                const description = taskDescription.value.trim();
+                const assigneeInputValue = assigneeInput.value.trim();
+                // Get the current column ID
+                const columnId = currentColumn.id; // 'new', 'planned', 'in-progress', or 'completed'
+                
+                // Map to correct status enum
+                const status = statusMapping[columnId] || columnId; // Use mapped value or default
+            
+                console.log(`Task status being sent: "${status}"`); // Log the status for debugging
+            
+                if (title && assignee) {  // Ensure title and assignee are provided
+                    try {
+                        const response = await fetch('/api/tasks', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ title, description, status, assignee:assigneeInputValue }) // Include assignee
+                        });
+            
+                        const taskData = await response.json();
+                        if (response.ok) {
+                            addTaskToColumn(taskData.task, status);  // Add task to the board
+                            popup.style.display = 'none';  // Hide the popup
+                        } else {
+                            alert(taskData.message);
+                        }
+                    } catch (error) {
+                        console.error("Error saving task:", error);
+                    }
+                } else {
+                    alert("Please provide both title and assignee.");
+                }
+            });
+            
+            
+            
+            
+            
+              
+            
+            // Function to add a task to the column
+            function addTaskToColumn(taskData, status) {
+                // Use hyphenated status for the column ID
+                const columnId = status.toLowerCase().replace(' ', '-'); // e.g., 'in-progress'
+                const column = document.getElementById(columnId);
+                
+                if (!column) {
+                    console.error(`Column with ID "${columnId}" not found.`);
+                    return; 
+                }
+            
+                // Create the task element
+                const task = document.createElement('div');
+                task.classList.add('task');
+                task.setAttribute('draggable', 'true');
+                task.dataset.id = taskData._id; // Use the task ID returned from the server
+                task.textContent = taskData.title; // Set the task title
+            
+                // Create members div
+                const membersDiv = document.createElement('div');
+                membersDiv.classList.add('members');
+                if (taskData.members) {
+                    taskData.members.forEach(member => {
+                        const memberDiv = document.createElement('div');
+                        memberDiv.classList.add('member');
+                        memberDiv.textContent = member.name; // Assuming member has a name property
+                        membersDiv.appendChild(memberDiv); // Append member to the members div
+                    });
+                }
+                // Append delete button
+                const deleteBtn = document.createElement('button');
+                deleteBtn.classList.add('delete-task');
+                deleteBtn.textContent = '✕';
+                deleteBtn.addEventListener('click', async function() {
+                    try {
+                        const response = await fetch(`/api/tasks/${taskData._id}`, {
+                            method: 'DELETE',
+                        });
+            
+                        if (!response.ok) {
+                            const errorData = await response.json();
+                            alert(`Error deleting task: ${errorData.message}`);
+                            return;
+                        }
+            
+                        task.remove(); // Remove the task from the UI
+                        alert('Task deleted successfully!');
+                    } catch (error) {
+                        console.error('Error deleting task:', error);
+                        alert('An error occurred while deleting the task.');
+                    }
+                });
+            
+                // Add member button
+                const addMemberImg = document.createElement('div');
+                addMemberImg.classList.add('add-member');
+                const img = document.createElement('img');
+                img.src = '/image 34.png'; // Path to your image
+                img.alt = 'Add Member';
+                addMemberImg.appendChild(img);
+                addMemberImg.addEventListener('click', function() {
+                    // Check if taskData is valid
+                    console.log('Task data being passed for member addition:', taskData); // Log taskData
+                    currentMemberTask = taskData; // Save the current task for member addition
+                    memberNameInput.value = '';
+                    memberPopup.style.display = 'flex'; // Show the member popup
+                });
+                
+                // Append everything to the task
+                task.appendChild(deleteBtn);
+                task.appendChild(addMemberImg);
+                task.appendChild(membersDiv); // Append the members div to the task
+                task.addEventListener('dragstart', dragStart);
+                
+                // Insert the task before the "Add Task" button
+                column.querySelector('.add-task').before(task);
+            }
+            
+            
+            // Save member functionality
+            document.getElementById('saveMember').addEventListener('click', async function() {
+                const memberName = memberNameInput.value.trim();
+                
+                if (memberName && currentMemberTask) {
+                    // Create the member element in the UI
+                    const memberDiv = document.createElement('div');
+                    memberDiv.classList.add('member');
+                    memberDiv.textContent = memberName;
+            
+                    // Ensure you are using the correct task ID
+                    const membersDiv = document.querySelector(`.task[data-id='${currentMemberTask._id}'] .members`);
+                    
+                    if (!membersDiv) {
+                        console.error('Members div not found for task:', currentMemberTask._id);
+                        return; // Exit if the members div is not found
+                    }
+                    
+                    membersDiv.appendChild(memberDiv); // Append the member to the members div
+            
+                    // Fetch the updated members from the task element
+                    const updatedMembers = Array.from(membersDiv.querySelectorAll('.member')).map(member => ({ name: member.textContent }));
+            
+                    // Log for debugging
+                    console.log('Updating task ID:', currentMemberTask._id, 'with members:', updatedMembers);
+            
+                    // Update the task in the backend with the new member
+                    try {
+                        const response = await fetch(`/api/tasks/${currentMemberTask._id}`, {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ members: updatedMembers, status: currentMemberTask.status }) // Send both members and status
+                        });
+            
+                        if (!response.ok) {
+                            const errorData = await response.json();
+                            alert(`Error adding member: ${errorData.message}`);
+                            return;
+                        }
+            
+                        memberPopup.style.display = 'none'; // Close the member popup on success
+                    } catch (error) {
+                        console.error('Error updating task with new member:', error);
+                    }
+                }
+            });
+            
+            
+            
+            // Close member popup
+            document.getElementById('closeMemberPopup').addEventListener('click', function() {
+                memberPopup.style.display = 'none';
+            });
+        });
+
+        document.getElementById("logout-btn").addEventListener("click", function () {
+            fetch('/logout', {
+                method: 'POST', // Send a POST request for logout
+                credentials: 'include', // Include cookies (session info)
+            })
+            .then((response) => {
+                if (response.ok) {
+                    // Redirect to the home page on successful logout
+                    window.location.href = '/html/home.html';
+                } else {
+                    alert("Failed to log out. Please try again.");
+                }
+            })
+            .catch((error) => {
+                console.error('Error logging out:', error);
+            });
+        });
+    </script>
+</body>
+</html>

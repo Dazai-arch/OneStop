@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OneSTOP About</title>
+    <link rel="stylesheet" href="/css/about.css">
+    
+
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo"><a href="/html/dashboard.html"><img src="/OneSTOPlogo.png"></a>
+            </div>
+
+            <div class="team-tag">
+                <div class="details">
+                    <h4 id="username"></h4>
+                    <p id="designation"></p>
+                </div>
+                <div class="avatar"><a href="/html/proffile.html">
+                    <img src="" alt="" id="profileimage"></a>
+                </div>
+            </div>
+        
+        <button class="noselect" onclick="openPopup()"> 
+            <span class="text">Add</span>
+            <span class="icon"><span class="buttonSpan">+</span></span>
+        </button>
+        
+        <button class="login-signup-btn" id="logout-btn">Log Out</button>
+        
+        <ul class="menu">
+            <li>
+                <img src="/dashboardpng.png" alt="Dashboard Icon" class="menu-icon">
+                <span><a href="/html/dashboard.html">Dashboard</a></span>
+            </li>
+            <li>
+                <img src="/projectspng.png" alt="Projects Icon" class="menu-icon">
+                <span><a href="/html/project.html">Projects</a></span>
+            </li>
+            <li>
+                <img src="/taskpng.png" alt="Tasks Icon" class="menu-icon">
+                <span><a href="/html/tasks.html">Tasks</a></span>
+            </li>
+            <li>
+                <img src="/ideaspng.png" alt="Ideas Icon" class="menu-icon">
+                <span><a href="#">Ideas</a></span>
+            </li>
+            <li>
+                <img src="/collaboratorpng.png" alt="Collaborators Icon" class="menu-icon">
+                <span><a href="/html/collaborator.html">Collaborators</a></span>
+            </li>
+
+
+            <a href="#"><img src="/image 11.png" alt="Bottom Image" class="bottom-image"></a>
+        </ul>
+
+    </div>
+    
+    <div class="main-content">
+        <div class="container">
+     
+            <header>
+                <h1>Meet <span>our</span> dev team</h1>
+                <p>“Our philosophy is simple, providing the best possible way to<br>manage, track tasks, resources, and projects”<br></p>
+            </header>
+            <div class="team-grid" id="teamGrid"></div>
+        </div>
+        <div id="projectPopup" class="popup">
+            <div class="popup-content">
+                <span class="close" onclick="closePopup()">&times;</span>
+                <h2>Add New Project</h2>
+                <input type="text" id="newProjectName" placeholder="Enter Project Name">
+                <div class="addb" onclick="addProject()">Add Project</div>
+            </div>
+        </div>
+        <script src="/js/addotherpage.js"></script>
+        <script>
+            // Sample team data that could be dynamically fetched from a server or API
+            const teamData = [
+                {
+                    name: "Vaibhav Lalwani",
+                    role: "Frontend Developer",
+                    img: "image 54 (1).png", // Replace with real image URLs
+                    linkedin: "#",
+                    github: "#"
+                },
+                {
+                    name: "Darshan Chopra",
+                    role: "Diagram Developer",
+                    img: "image_2024-09-23_143917825-removebg-preview.png",
+                    linkedin: "#",
+                    github: "#"
+                },
+                {
+                    name: "Alok Tayal",
+                    role: "Full Stack Developer",
+                    img: "https://via.placeholder.com/100",
+                    linkedin: "#",
+                    github: "#"
+                },
+                {
+                    name: "Mahalakshmi",
+                    role: "Guide",
+                    img: "https://via.placeholder.com/100",
+                    linkedin: "#",
+                    github: "#"
+                }
+            ];
+    
+            const teamGrid = document.getElementById('teamGrid');
+    
+            // Function to create team member card dynamically
+            function createTeamMember(member) {
+                const teamMember = document.createElement('div');
+                teamMember.classList.add('team-member');
+                teamMember.innerHTML = `
+                    <img src="${member.img}" alt="${member.name}">
+                    <h3>${member.name}</h3>
+                    <p>${member.role}</p>
+                    <div class="social-links">
+                        <a href="${member.linkedin}" target="_blank">
+                            <img src="https://cdn-icons-png.flaticon.com/512/174/174857.png" alt="LinkedIn">
+                        </a>
+                        <a href="${member.github}" target="_blank">
+                            <img src="https://cdn-icons-png.flaticon.com/512/25/25231.png" alt="GitHub">
+                        </a>
+                    </div>
+                `;
+                return teamMember;
+            }
+    
+            // Render team members dynamically
+            teamData.forEach(member => {
+                const teamMemberElement = createTeamMember(member);
+                teamGrid.appendChild(teamMemberElement);
+            });
+
+            document.addEventListener('DOMContentLoaded', () => {
+                fetch('/api/get-selected-project')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        fetchTasksForProject(data.projectId);
+                    } else {
+                        alert('No project selected.');
+                        window.location.href = '/html/project.html';
+                    }
+                })
+                .catch(error => console.error('Error fetching selected project:', error));
+                fetch('/profile')
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById('username').textContent = data.username;
+                        document.getElementById('designation').textContent = data.designation;
+                        document.getElementById('profileimage').src = data.image;
+                    })
+                    .catch(error => console.error('Error fetching profile data:', error));
+    
+                
+              });
+    
+              document.getElementById("logout-btn").addEventListener("click", function () {
+                fetch('/logout', {
+                    method: 'POST', // Send a POST request for logout
+                    credentials: 'include', // Include cookies (session info)
+                })
+                .then((response) => {
+                    if (response.ok) {
+                        // Redirect to the home page on successful logout
+                        window.location.href = '/html/home.html';
+                    } else {
+                        alert("Failed to log out. Please try again.");
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error logging out:', error);
+                });
+            });
+
+        </script>
+    
+
+</body>
+
+</html>

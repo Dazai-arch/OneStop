@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OneSTOP Dashboard</title>
+    <link rel="stylesheet" href="/css/dashboard.css">
+</head>
+<body>
+    
+    <div class="sidebar">
+        <div class="logo"><img src="/OneSTOPlogo.png" alt="OneSTOP Logo"></div>
+        
+        <button class="noselect" onclick="openPopup()">
+            <span class="text">Add</span>
+            <span class="icon"><span class="buttonSpan">+</span></span>
+        </button>
+
+        <div id="projectPopup" class="popup">
+            <div class="popup-content">
+                <span class="close" onclick="closePopup()">&times;</span>
+                <h2>Add New Project</h2>
+                <input type="text" id="newProjectName" placeholder="Enter Project Name">
+                <div class="addb" onclick="addProject()">Add Project</div>
+            </div>
+        </div>
+
+        <button class="login-signup-btn" id="logout-btn">Log Out</button>
+        
+        <ul class="menu">
+            <li>
+                <img src="/dashboardpng.png" alt="Dashboard Icon" class="menu-icon">
+                <span><a href="/html/dashboard.html">Dashboard</a></span>
+            </li>
+            <li>
+                <img src="/projectspng.png" alt="Projects Icon" class="menu-icon">
+                <span><a href="/html/project.html">Projects</a></span>
+            </li>
+            <li>
+                <img src="/taskpng.png" alt="Tasks Icon" class="menu-icon">
+                <span><a href="/html/tasks.html">Tasks</a></span>
+            </li>
+            <li>
+                <img src="/ideaspng.png" alt="Ideas Icon" class="menu-icon">
+                <span><a href="">Ideas</a></span>
+            </li>
+            <li>
+                <img src="/collaboratorpng.png" alt="Collaborators Icon" class="menu-icon">
+                <span><a href="/html/collaborator.html">Collaborators</a></span>
+            </li>
+
+            <a href="/html/about.html"><img src="/image 11.png" alt="Bottom Image" class="bottom-image"></a>
+        </ul>
+    </div>
+    
+    <div class="main-content">
+        <div class="header">
+            <h1>Dashboard</h1> 
+            <div class="team-tag">
+                <div class="details">
+                    <h4 id="username"></h4>
+                    <p id="designation"></p>
+                </div>
+                <div class="avatar"><a href="/html/proffile.html">
+                    <img src="" alt="" id="profileimage"></a>
+                </div>
+            </div>
+       
+        </div>
+
+        <div class="overviewq">overview</div>
+        
+        <div class="overview">
+            <div class="card">
+                <img src="/image 14.png" >
+                <h3>Total Budget</h3>
+                <p class="total-budget"></p>
+            </div>
+            <div class="card">
+                <img src="/image 15.png" >
+                <h3>Projects</h3>
+                <p class="project-count"></p>
+            </div>
+            <div class="card">
+                <img src="/image 16.png" >
+                <h3>Time Spent</h3>
+                <p class="time-spent"></p>
+            </div>
+            <div class="card">
+                <img src="/image 17.png" >
+                <h3>Resources</h3>
+                <p id="resource-count"></p>
+            </div>
+        </div>
+        
+    <div class="flexy">
+            <div class="container project-summary">
+                <div class="header">
+                    <h1>Project Summary</h1>
+                    <div class="filters">
+                        
+                        <select id="manager-filter" class="filter">
+                            <option value="all">Project Manager</option>
+                        </select>
+                        <select id="status-filter" class="filter">
+                            <option value="all">Select Status</option>
+                        </select>
+                    </div>
+                </div>
+        
+                <table class="project-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Project Manager</th>
+                            <th>Due Date</th>
+                            <th>Status</th>
+                            <th>Progress</th>
+                        </tr>
+                    </thead>
+                    <tbody id="project-body">
+                        <!-- Dynamic rows will be generated here -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="gauge-container">
+                <h2>Overall Progress</h2>
+                <div class="gauge-chart">
+                    <div class="gauge">
+                        <div class="gauge-bar"></div>
+                        <div class="gauge-cover"></div>
+                    </div>
+                    <div class="gauge-text">
+                        <span id="gauge-percentage">72%</span>
+                        <p>Completed</p>
+                    </div>
+                </div>
+                <div class="project-info">
+                    <div class="info">
+                        <h3 id="total-projects"></h3>
+                        <p>Total Tasks</p>
+                    </div>
+                    <div class="info completed">
+                        <h3 id="completed-projects"></h3>
+                        <p>Completed</p>
+                    </div>
+                    <div class="info delayed">
+                        <h3 id="delayed-projects"></h3>
+                        <p>Delayed</p>
+                    </div>
+                    <div class="info ongoing">
+                        <h3 id="ongoing-projects"></h3>
+                        <p>Ongoing</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+            
+        <div class="dip">
+
+        
+            <!-- Project Workload Section -->
+            <div class="containeryy workload-section">
+                <h3>Projects Workload</h3>
+                <div class="time-range">
+                    <select id="time-range">
+                        <option value="Last 3 months">Last 3 months</option>
+                        <option value="Last 6 months">Last 6 months</option>
+                        <option value="Last year">Last year</option>
+                    </select>
+                </div>
+        
+                <div class="workload-chart">
+                    <!-- Dynamic workload circles will go here -->
+                </div>
+            </div>
+        
+        
+            <!-- Task Container Section -->
+            <div class="task-container">
+                <div class="tabs">
+                    <span class="tab active" data-tab="all">All <span class="count">10</span></span>
+                    <span class="tab" data-tab="important">Important <span class="count">5</span></span>
+                    <span class="tab" data-tab="new">New <span class="count">5</span></span>
+                    <span class="tab" data-tab="old">Old <span class="count">10</span></span>
+                </div>
+        
+                <div class="tasks" id="tasks">
+                    <!-- Dynamic task entries will go here -->
+                </div>
+            </div>
+            
+        </div>
+    
+    
+
+    
+    
+    
+</div>
+</div>
+</div>
+<!-- <footer class="padh">
+    <div class="dabba">
+        <div class="padh-ka-content">
+            <h2 class="sitelogo">OneS<Span class="s">T</Span>OP</h2>
+            <p class="padh-ka-text">Your ultimate project management solution.</p>
+            <ul class="social-jod">
+                <li><a href="" target="_blank">About us</a></li>
+                <li><a href="#" target="_blank">Home</a></li>
+                <li><a href="#" target="_blank">GitHub</a></li>
+                
+            </ul>
+        </div>
+        <div class="padh-ka-bottom">
+            <p>© 2024 OneStop. All Rights Reserved.</p>
+        </div>
+    </div>
+</footer> -->
+
+
+
+<script src="/js/addotherpage.js"></script>
+
+    <script src="/js/dashboard.js"></script>
+    
+    
+</body>
+</html>

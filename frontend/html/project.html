@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OneSTOP Dashboard</title>
+    <link rel="stylesheet" href="/css/projects.css">
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo"><img src="/OneSTOPlogo.png"></div>
+        
+        <button class="noselect" onclick="openPopup()">
+            <span class="text">Add</span>
+            <span class="icon"><span class="buttonSpan">+</span></span>
+        </button>
+
+        <div id="projectPopup" class="popup">
+            <div class="popup-content">
+                <span class="close" onclick="closePopup()">&times;</span>
+                <h2>Add New Project</h2>
+                <input type="text" id="newProjectName" placeholder="Enter Project Name">
+                <div class="addb" onclick="addProject()">Add Project</div>
+            </div>
+        </div>
+        
+        
+        <button class="login-signup-btn" id="logout-btn">Log Out</button>
+        
+        <ul class="menu">
+            <li>
+                <img src="/dashboardpng.png" alt="Dashboard Icon" class="menu-icon">
+                <span><a href="/html/dashboard.html" id="dashboard-link">Dashboard</a></span>
+            </li>
+            <li>
+                <img src="/projectspng.png" alt="Projects Icon" class="menu-icon">
+                <span><a href="#" id="projects-link">Projects</a></span>
+            </li>
+            <li>
+                <img src="/taskpng.png" alt="Tasks Icon" class="menu-icon">
+                <span><a href="/html/tasks.html" id="tasks-link">Tasks</a></span>
+            </li>
+            <li>
+                <img src="/ideaspng.png" alt="Ideas Icon" class="menu-icon">
+                <span><a href="#" id="ideas-link">Ideas</a></span>
+            </li>
+            <li>
+                <img src="/collaboratorpng.png" alt="Collaborators Icon" class="menu-icon">
+                <span><a href="/html/collaborator.html" id="collaborators-link">Collaborators</a></span>
+            </li>
+            <a href="/html/about.html"><img src="/image 11.png" alt="Bottom Image" class="bottom-image"></a>
+        </ul>
+    </div>
+    
+    <div class="main-content">
+        <div class="container">
+            <header>
+                <h1>Projects</h1>
+                
+                <div class="navbar">
+                    <button class="tab active" id="projects-tab">Projects</button>
+                    <a href="/html/ganttchart.html"><button class="tab" id="gantt-chart-tab">Gantt charts</button></a>
+                    <a href="/html/board.html" id="board-link"><button class="tab">Board</button></a>
+                    <a href="/html/resources.html"><button class="tab" id="resources-tab">Resources</button></a>
+                </div>
+            </header>
+            
+       
+            <div class="team-tag">
+                <div class="details">
+                    <h4 id="username"></h4>
+                    <p id="designation"></p>
+                </div>
+                <div class="avatar"><a href="/html/proffile.html">
+                    <img src="" alt="" id="profileimage"></a>
+                </div>
+            </div>
+    
+            <main>
+                <div class="project-header">
+                    <span>Project Name</span>
+                </div>
+    
+                <ul id="project-list" class="project-list">
+                    <!-- Projects will be dynamically inserted here -->
+                </ul>
+    
+                <div class="add-project">
+                    <input type="text" id="project-input" placeholder="Enter new project">
+                    <button id="add-project-btn">Add Project</button>
+                </div>
+            </main>
+        </div>
+    </div>
+    
+
+    <script src="/js/addProject.js"></script>
+    <script>
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const projectList = document.getElementById('project-list');
+            const addProjectBtn = document.getElementById('add-project-btn');
+            const projectInput = document.getElementById('project-input');
+            
+            // Fetch user profile
+            fetch('/profile')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('username').textContent = data.username;
+                    document.getElementById('designation').textContent = data.designation;
+                    document.getElementById('profileimage').src = data.image;
+                })
+                .catch(error => console.error('Error fetching profile data:', error));
+            
+            let projects = [];
+            
+            // Fetch user projects
+            async function fetchUserProjects() {
+                try {
+                    const response = await fetch('/api/project');
+                    projects = await response.json();
+                    if (Array.isArray(projects)) {
+                        //console.log('Projects fetched:', projects);
+                        renderProjects(projects);  // Render only if it’s an array
+                    } else {
+                        throw new Error('Invalid response format: Expected an array');
+                    }
+                } catch (error) {
+                    console.error('Error fetching projects:', error);
+                    alert('Error fetching projects.');
+                }
+            }
+            // Function to update sidebar links based on project existence
+            let selectedProjectId = null; // Variable to hold the selected project ID
+
+            function updateSidebarLinks() {
+                const links = [
+                    'dashboard-link',
+                    'projects-link',
+                    'tasks-link',
+                    'ideas-link',
+                    'board-link',
+                    'collaborators-link',
+                    'gantt-chart-tab',
+                    'resources-tab'
+                ];
+
+                links.forEach(linkId => {
+                    const link = document.getElementById(linkId);
+                    if (link) {
+                        if (selectedProjectId) { // Check if a project is selected
+                            link.classList.remove('disabled'); // Enable link
+                            link.href = linkId === 'gantt-chart-tab' ? 'gantt.html' : (linkId === 'resources-tab' ? 'resources.html' : 'board.html'); // Restore href
+                        } else {
+                            link.classList.add('disabled'); // Disable link
+                            link.href = '#'; // Set href to # to disable link
+                        }
+                        
+                        // Add click event listener
+                        link.removeEventListener('click', handleDisabledLinkClick); // Ensure no duplicate listeners
+                        link.addEventListener('click', handleDisabledLinkClick);
+                    }
+                });
+            }
+
+            function handleDisabledLinkClick(event) {
+                const link = event.currentTarget; // Get the link that was clicked
+                if (link.classList.contains('disabled')) {
+                    event.preventDefault(); // Prevent navigation
+                    alert('Please choose a project first.'); // Show alert
+                }
+            }
+
+            // Function to render the list of projects
+            window.deleteProject = async function(projectId) {
+                try {
+                    const response = await fetch(`/api/projects/${projectId}`, {
+                        method: 'DELETE',
+                    });
+            
+                    if (response.ok) {
+                        // Find the project in the local array and remove it
+                        projects = projects.filter(project => project._id !== projectId);
+                        renderProjects(projects); // Re-render the project list
+                        alert('Project deleted successfully!');
+                    } else {
+                        const errorData = await response.json();
+                        alert(`Error deleting project: ${errorData.message}`);
+                    }
+                } catch (error) {
+                    console.error('Error deleting project:', error);
+                    alert('An error occurred while deleting the project.');
+                }
+            };
+            
+            // Function to render the list of projects
+
+            // Function to select a project
+            window.selectProject = function(projectId) {
+                selectedProjectId = projectId; // Set the selected project ID
+                updateSidebarLinks(); // Update sidebar links based on the selected project
+                // Optionally redirect to another page or fetch more data about the project
+            };
+            // Function to render the list of projects
+            function renderProjects(projects) {
+                projectList.innerHTML = ''; // Clear current list
+        
+                projects.forEach((project) => {
+                    const projectItem = document.createElement('li');
+                    projectItem.className = 'project-item';
+                    const collaborators = project.collaborators.map(c => c.username).join(', ');
+                    // Add project name as a clickable link without projectId in URL
+                    projectItem.innerHTML = `
+                        <a class="project-link" href="javascript:void(0)" onclick="selectProject('${project._id}')">${project.name}</a>
+                        <span>Collaborators: ${collaborators}</span>
+                        <button onclick="deleteProject('${project._id}')">✕</button>
+                    `;
+        
+                    projectList.appendChild(projectItem);
+                });
+            }
+        
+            // Function to select a project
+            window.selectProject = function(projectId) {
+                fetch('/api/select-project', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ projectId })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        window.location.href = '/html/board.html'; // No projectId in URL
+                    } else {
+                        alert('Failed to select project.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error selecting project:', error);
+                });
+            };
+        
+        
+            // Add new project to the list
+            addProjectBtn.addEventListener('click', async () => {
+                const projectName = projectInput.value.trim();
+            
+                if (projectName) {
+                    try {
+                        const response = await fetch('/api/projects', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ name: projectName })
+                        });
+        
+                        if (response.ok) {
+                            const projectData = await response.json();
+                            projects.push(projectData.project);
+                            renderProjects(projects);
+                            projectInput.value = ''; // Clear input
+                        } else {
+                            const errorData = await response.json();
+                            alert(errorData.message);
+                        }
+                    } catch (error) {
+                        console.error('Error adding project:', error);
+                    }
+                } else {
+                    alert("Please enter a project name.");
+                }
+            });
+        
+            // Fetch and render user projects
+            fetchUserProjects();
+        });
+
+        
+        
+        document.getElementById("logout-btn").addEventListener("click", function () {
+            fetch('/logout', {
+                method: 'POST', // Send a POST request for logout
+                credentials: 'include', // Include cookies (session info)
+            })
+            .then((response) => {
+                if (response.ok) {
+                    // Redirect to the home page on successful logout
+                    window.location.href = '/html/home.html';
+                } else {
+                    alert("Failed to log out. Please try again.");
+                }
+            })
+            .catch((error) => {
+                console.error('Error logging out:', error);
+            });
+        });
+            
+    
+        // Tab navigation functionality
+        
+
+    
+
+    </script>
+</body>
+</html>

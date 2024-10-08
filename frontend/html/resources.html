@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OneSTOP Dashboard</title>
+    <link rel="stylesheet" href="/css/resources.css">
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo"><img src="/OneSTOPlogo.png"></div>
+        
+        <button class="noselect" onclick="openPopup()">
+            <span class="text">Add</span>
+            <span class="icon"><span class="buttonSpan">+</span></span>
+        </button>
+
+        <div id="projectPopup" class="popup">
+            <div class="popup-content">
+                <span class="close" onclick="closePopup()">&times;</span>
+                <h2>Add New Project</h2>
+                <input type="text" id="newProjectName" placeholder="Enter Project Name">
+                <div class="addb" onclick="addProject()">Add Project</div>
+            </div>
+        </div>
+        
+        <button class="login-signup-btn" id="logout-btn">Log Out</button>
+        
+        <ul class="menu">
+            <li>
+                <img src="/dashboardpng.png" alt="Dashboard Icon" class="menu-icon">
+                <span><a href="/html/dashboard.html">Dashboard</a></span>
+            </li>
+            <li>
+                <img src="/projectspng.png" alt="Projects Icon" class="menu-icon">
+                <span><a href="/html/project.html">Projects</a></span>
+            </li>
+            <li>
+                <img src="/taskpng.png" alt="Tasks Icon" class="menu-icon">
+                <span><a href="/html/tasks.html">Tasks</a></span>
+            </li>
+            <li>
+                <img src="/ideaspng.png" alt="Ideas Icon" class="menu-icon">
+                <span><a href="">Ideas</a></span>
+            </li>
+            <li>
+                <img src="/collaboratorpng.png" alt="Collaborators Icon" class="menu-icon">
+                <span><a href="/html/collaborator.html">Collaborators</a></span>
+            </li>
+
+            <a href=""><img src="/image 11.png" alt="Bottom Image" class="bottom-image"></a>
+        </ul>
+    </div>
+    
+    <div class="main-content">
+        <div class="container">
+            <header>
+                <h1>Resources</h1>
+                
+                <div class="navbar">
+                    <a href="/html/project.html"><button class="tab">Projects</button></a>
+                    <a href="/html/ganttchart.html"><button class="tab">Gantt charts</button></a>
+                    <a href="/html/board.html"><button class="tab">Board</button></a>
+                 <a href="#"><button class="tab active">Resources</button></a> 
+                </div>
+            </header>
+            
+       
+            <div class="team-tag">
+                <div class="details">
+                    <h4 id="username"></h4>
+                    <p id="designation"></p>
+                </div>
+                <div class="avatar"><a href="/html/proffile.html">
+                    <img src="" alt="" id="profileimage"></a>
+                </div>
+            </div>
+    
+            <main>
+                <div class="project-header">
+                    <span>Resources</span>
+                </div>
+    
+                <div class="resources-section">
+                    <div class="resource-grid">
+                      <div class="resource" data-resource="HTML">
+                        <img src="/html.png" alt="HTML">
+                      </div>
+                      <div class="resource" data-resource="CSS">
+                        <img src="/css.png" alt="CSS">
+                      </div>
+                      <div class="resource" data-resource="JavaScript">
+                        <img src="/javascript.png" alt="JavaScript">
+                      </div>
+                      <div class="resource" data-resource="Word">
+                        <img src="/word.png" alt="MS Word">
+                      </div>
+                      <div class="resource" data-resource="React">
+                        <img src="/react.png" alt="React">
+                      </div>
+                      <div class="resource" data-resource="Excel">
+                        <img src="/excel.png" alt="Excel">
+                      </div>
+                      <div class="resource" data-resource="WordPress">
+                        <img src="/wordpress.png" alt="WordPress">
+                      </div>
+                      <div class="resource" data-resource="Python">
+                        <img src="/python.png" alt="Python">
+                      </div>
+                      <div class="resource" data-resource="ChatGPT">
+                        <img src="/chatgpt.png" alt="ChatGPT">
+                      </div>
+                      <div class="resource" data-resource="MySQL">
+                        <img src="/mysql.png" alt="MySQL">
+                      </div>
+                      <div class="resource" data-resource="MongoDB">
+                        <img src="/mongodb.png" alt="MongoDB">
+                      </div>
+                      <div class="resource" data-resource="GoLang">
+                        <img src="/golang.png" alt="GoLang">
+                      </div>
+                      <div class="resource" data-resource="GitHub">
+                        <img src="/github.png" alt="GitHub">
+                    </div>
+                    <div class="resource" data-resource="Nodejs">
+                        <img src="/nodejs.png" alt="Node.js">
+                    </div>
+                    <div class="resource" data-resource="Django">
+                        <img src="/django.png" alt="Django">
+                    </div>
+                    <div class="resource" data-resource="Vuejs">
+                        <img src="/vuejs.png" alt="Vue.js">
+                    </div>
+                    <div class="resource" data-resource="Angularjs">
+                        <img src="/angularjs.png" alt="Angular">
+                    </div>
+                    <div class="resource" data-resource="Docker">
+                        <img src="/docker.png" alt="Docker">
+                    </div>
+                    <div class="resource" data-resource="AWS">
+                        <img src="/aws.png" alt="AWS">
+                    </div>
+                    <div class="resource" data-resource="Firebase">
+                        <img src="/firebase.png" alt="Firebase">
+                    </div>
+                    <div class="resource" data-resource="Kubernetes">
+                        <img src="/kubernetes.png" alt="Kubernetes">
+                    </div>
+                    <div class="resource" data-resource="PHP">
+                        <img src="/php.png" alt="PHP">
+                    </div>
+                    <div class="resource" data-resource="Ruby">
+                        <img src="/ruby.png" alt="Ruby on Rails">
+                    </div>
+                    <div class="resource" data-resource="Swift">
+                        <img src="/swift.png" alt="Swift">
+                    </div>
+                    </div>
+                  </div>
+              
+                  <!-- Selected Resources Section -->
+                  <div class="selected-resources">
+                    <h3>Selected Resources: <span id="selected-count">0</span></h3>
+                    <div id="selected-items"></div>
+                    <button id="clear-btn">Clear All</button>
+                  </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    <script src="/js/addotherpage.js"></script>
+    <script>
+       // Tab navigation functionality
+       document.addEventListener('DOMContentLoaded', () => {
+        const tabs = document.querySelectorAll('.tab');
+    
+        // Add event listeners to each tab
+        tabs.forEach(tab => {
+            tab.addEventListener('click', function() {
+                tabs.forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+        fetch('/profile')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('username').textContent = data.username;
+                    document.getElementById('designation').textContent = data.designation;
+                    document.getElementById('profileimage').src = data.image;
+                })
+                .catch(error => console.error('Error fetching profile data:', error));
+    
+        // Check if a project is selected
+        fetch('/api/get-selected-project')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    projectId = data.projectId; // Get projectId from the response
+                    loadResourcesFromDB(); // Load resources for this project
+                } else {
+                    alert('No project selected.');
+                    window.location.href = '/html/project.html';
+                }
+            })
+            .catch(error => console.error('Error fetching selected project:', error));
+    });
+    
+    function loadResourcesFromDB() {
+        fetch('/api/get-resources') // No need to pass projectId in URL now
+            .then(response => response.json())
+            .then(data => {
+                selectedResources = data.selectedResources || []; // Use empty array if no resources found
+                updateSelectedResources(); // Update UI with the retrieved resources
+            })
+            .catch(error => {
+                console.error('Error fetching resources:', error);
+            });
+    }
+    
+    function saveResourcesToDB() {
+        fetch('/api/save-resources', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ resources: selectedResources }), // Send only resources now
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data.message);
+        })
+        .catch(error => {
+            console.error('Error saving resources:', error);
+        });
+    }
+    
+    document.querySelectorAll('.resource img').forEach(img => {
+        img.addEventListener('click', () => {
+            const resourceName = img.parentElement.dataset.resource;
+    
+            // Toggle resource selection
+            if (selectedResources.includes(resourceName)) {
+                selectedResources = selectedResources.filter(item => item !== resourceName);
+                img.style.opacity = '1';
+            } else {
+                selectedResources.push(resourceName);
+                img.style.opacity = '0.5';
+            }
+    
+            updateSelectedResources(); // Update UI
+            saveResourcesToDB(); // Save changes to the backend
+        });
+    });
+    
+    function updateSelectedResources() {
+        const selectedCount = document.getElementById('selected-count');
+        const selectedItemsDiv = document.getElementById('selected-items');
+    
+        // Clear previous selected items
+        selectedItemsDiv.innerHTML = '';
+    
+        // Update count
+        selectedCount.textContent = selectedResources.length;
+    
+        // Display selected resources
+        selectedResources.forEach(resource => {
+            const itemDiv = document.createElement('div');
+            itemDiv.classList.add('selected-item');
+            itemDiv.innerHTML = `
+                <img src="/${resource.toLowerCase()}.png" alt="${resource}">
+                <span>${resource}</span>
+                <button class="remove-btn" onclick="removeResource('${resource}')">Remove</button>
+            `;
+            selectedItemsDiv.appendChild(itemDiv);
+        });
+    }
+    
+    function removeResource(resource) {
+        // Remove the resource from the selectedResources array
+        selectedResources = selectedResources.filter(item => item !== resource);
+    
+        // Reset the opacity of the deselected resource image
+        const resourceImage = document.querySelector(`[data-resource="${resource}"] img`);
+        if (resourceImage) {
+            resourceImage.style.opacity = '1';
+        }
+    
+        // Update the UI and save the updated resources to the backend
+        updateSelectedResources();
+        saveResourcesToDB();
+    }
+    
+    document.getElementById('clear-btn').addEventListener('click', () => {
+        selectedResources = [];
+    
+        document.querySelectorAll('.resource img').forEach(img => {
+            img.style.opacity = '1'; // Reset opacity
+        });
+    
+        updateSelectedResources();
+        saveResourcesToDB(); // Save cleared resources
+    });
+    
+      
+      // Clear all selected resources
+      
+      document.getElementById("logout-btn").addEventListener("click", function () {
+        fetch('/logout', {
+            method: 'POST', // Send a POST request for logout
+            credentials: 'include', // Include cookies (session info)
+        })
+        .then((response) => {
+            if (response.ok) {
+                // Redirect to the home page on successful logout
+                window.location.href = '/html/home.html';
+            } else {
+                alert("Failed to log out. Please try again.");
+            }
+        })
+        .catch((error) => {
+            console.error('Error logging out:', error);
+        });
+    });
+      
+
+
+
+    </script>
+</body>
+</html>

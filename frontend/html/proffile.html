@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OneStop-Profile</title>
+    <link rel="stylesheet" href="/css/profile.css">
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo"><img src="/OneSTOPlogo.png">
+            </div>
+        
+            <button class="noselect" onclick="openPopup()">
+                <span class="text">Add</span>
+                <span class="icon"><span class="buttonSpan">+</span></span>
+            </button>
+    
+            <div id="projectPopup" class="popup">
+                <div class="popup-content">
+                    <span class="close" onclick="closePopup()">&times;</span>
+                    <h2>Add New Project</h2>
+                    <input type="text" id="newProjectName" placeholder="Enter Project Name">
+                    <div class="addb" onclick="addProject()">Add Project</div>
+                </div>
+            </div>
+        
+        <button class="login-signup-btn" id="logout-btn">Log Out</button>
+        
+        <ul class="menu">
+            <li>
+                <img src="/dashboardpng.png" alt="Dashboard Icon" class="menu-icon">
+                <span><a href="/html/dashboard.html">Dashboard</a></span>
+            </li>
+            <li>
+                <img src="/projectspng.png" alt="Projects Icon" class="menu-icon">
+                <span><a href="/html/project.html">Projects</a></span>
+            </li>
+            <li>
+                <img src="/taskpng.png" alt="Tasks Icon" class="menu-icon">
+                <span><a href="/html/tasks.html">Tasks</a></span>
+            </li>
+            <li>
+                <img src="/ideaspng.png" alt="Ideas Icon" class="menu-icon">
+                <span><a href="">Ideas</a></span>
+            </li>
+            <li>
+                <img src="/collaboratorpng.png" alt="Collaborators Icon" class="menu-icon">
+                <span><a href="/html/collaborator.html">Collaborators</a></span>
+            </li>
+
+
+            <a href="/html/about.html"><img src="/image 11.png" alt="Bottom Image" class="bottom-image"></a>
+        </ul>
+
+    </div>
+    
+    <div class="main-content">
+        <div class="card">
+            <div class="pdetails">
+                <div class="user">
+                <label for="username">Username</label><br>
+                <input type="text" id="username" name="username" value="" readonly>
+                </div>
+                <div class="designation">
+                    <label for="designation">Designation</label><br>
+                    <input type="text" id="designation" name="designation" value="" readonly>
+                </div>
+                <div class="email">
+                    <label for="email">Email</label><br>
+                    <input type="email" id="email" name="email" value="" readonly>
+                </div>
+                <div class="Created Date">
+                    <label for="createdDate">Created Date</label><br>
+                    <input type="text" id="date" name="date" value="" readonly>
+                </div>
+            </div>
+            <img src="" alt="" id="profileimage">
+        </div>
+        </div>
+        <script src="/js/addotherpage.js"></script>
+        <script src="/js/profile.js"></script>
+</body>
+</html>

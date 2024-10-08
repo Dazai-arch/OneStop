@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OneSTOP GanttChart</title>
+    <link rel="stylesheet" href="/css/ganttchart.css">
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo"><img src="/OneSTOPlogo.png"></div>
+        
+        <button class="noselect" onclick="openPopup()">
+            <span class="text">Add</span>
+            <span class="icon"><span class="buttonSpan">+</span></span>
+        </button>
+
+        <div id="projectPopup" class="popup">
+            <div class="popup-content">
+                <span class="close" onclick="closePopup()">&times;</span>
+                <h2>Add New Project</h2>
+                <input type="text" id="newProjectName" placeholder="Enter Project Name">
+                <div class="addb" onclick="addProject()">Add Project</div>
+            </div>
+        </div>
+        
+        <button class="login-signup-btn" id="logout-btn">Log Out</button>
+        
+        <ul class="menu">
+            <li>
+                <img src="/dashboardpng.png" alt="Dashboard Icon" class="menu-icon">
+                <span><a href="/html/dashboard.html">Dashboard</a></span>
+            </li>
+            <li>
+                <img src="/projectspng.png" alt="Projects Icon" class="menu-icon">
+                <span><a href="/html/project.html">Projects</a></span>
+            </li>
+            <li>
+                <img src="/taskpng.png" alt="Tasks Icon" class="menu-icon">
+                <span><a href="/html/tasks.html">Tasks</a></span>
+            </li>
+            <li>
+                <img src="/ideaspng.png" alt="Ideas Icon" class="menu-icon">
+                <span><a href="">Ideas</a></span>
+            </li>
+            <li>
+                <img src="/collaboratorpng.png" alt="Collaborators Icon" class="menu-icon">
+                <span><a href="/html/collaborator.html">Collaborators</a></span>
+            </li>
+
+            <a href="/html/about.html"><img src="/image 11.png" alt="Bottom Image" class="bottom-image"></a>
+        </ul>
+    </div>
+    
+    <div class="main-content">
+        <div class="container">
+            <header>
+                <h1>Gantt Chart</h1>
+                
+                <div class="navbar">
+                    <a href="/html/project.html"><button class="tab">Projects</button></a>
+                    <button class="tab active">Gantt charts</button>
+                    <a href="/html/board.html"><button class="tab">Board</button></a>
+                    <a href="/html/resources.html"><button class="tab">Resources</button></a>
+                </div>
+            </header>
+            
+       
+            <div class="team-tag">
+                <div class="details">
+                    <h4 id="username"></h4>
+                    <p id="designation"></p>
+                </div>
+                <div class="avatar"><a href="/html/proffile.html">
+                    <img src="" alt="" id="profileimage"></a>
+                </div>
+            </div>
+    
+            <main>
+                <div class="project-header">
+                    <span>Chart display</span>
+                </div>
+               
+                <!-- Gantt Chart -->
+                <div id="gantt-chart">
+                  <h2>Gantt Chart</h2>
+                  <div class="chart-container" id="chart-container">
+                    <!-- Dynamic Chart will be added here -->
+                  </div>
+                </div>
+
+              
+                
+
+              
+         
+       
+              
+            </main>
+        </div>
+    </div>
+   
+    <script src="/js/addotherpage.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            fetch('/api/get-selected-project')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        fetchTasksForProject(data.projectId);
+                    } else {
+                        alert('No project selected.');
+                        window.location.href = '/html/project.html';
+                    }
+                })
+                .catch(error => console.error('Error fetching selected project:', error));
+
+                fetch('/profile')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('username').textContent = data.username;
+                    document.getElementById('designation').textContent = data.designation;
+                    document.getElementById('profileimage').src = data.image;
+                })
+                .catch(error => console.error('Error fetching profile data:', error));
+        
+            function fetchTasksForProject(projectId) {
+                fetch(`/api/tasks`)
+                    .then(response => response.json())
+                    .then(tasks => {
+                        renderGanttChart(tasks);  // Call a function to display the Gantt chart with tasks
+                    })
+                    .catch(error => console.error('Error fetching tasks:', error));
+            }
+        
+            function renderGanttChart(tasks) {
+                const chartContainer = document.getElementById('chart-container');
+                chartContainer.innerHTML = '';  // Clear any existing content
+        
+                tasks.forEach(task => {
+                    const taskElement = document.createElement('div');
+                    taskElement.classList.add('task-bar');
+        
+                    const taskInfo = document.createElement('div');
+                    taskInfo.innerHTML = `
+                        <strong>${task.title}</strong> - ${task.assignee || 'Unassigned'} 
+                        (Due: ${new Date(task.dueDate).toLocaleDateString()}, Impact: ${task.impact}, 
+                        Budget: ${task.budget || 'N/A'})
+                    `;
+                    taskElement.appendChild(taskInfo);
+        
+                    const bar = document.createElement('div');
+                    bar.classList.add('bar', task.impact);  // Class based on impact
+                    bar.style.width = `${getImpactWidth(task.impact)}%`;  // Set width based on impact
+                    taskElement.appendChild(bar);
+        
+                    chartContainer.appendChild(taskElement);
+                });
+            }
+        
+            // Function to set Gantt bar width based on impact level
+            function getImpactWidth(impact) {
+                switch (impact.toLowerCase()) {
+                    case 'low':
+                        return 30;  // 30% width for low impact
+                    case 'medium':
+                        return 60;  // 60% width for medium impact
+                    case 'high':
+                        return 90;  // 90% width for high impact
+                    default:
+                        return 50;  // Default width if impact is not specified
+                }
+            }
+        
+            // Helper function to calculate Gantt bar width based on task due date
+            function calculateWidth(dueDate) {
+                const today = new Date();
+                const due = new Date(dueDate);
+                const diffTime = Math.abs(due - today);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        
+                const maxDays = 100;  // Adjust as needed for maximum width
+                return Math.min((diffDays / maxDays) * 100, 100);
+            }
+        });
+        
+
+          document.getElementById("logout-btn").addEventListener("click", function () {
+            fetch('/logout', {
+                method: 'POST', // Send a POST request for logout
+                credentials: 'include', // Include cookies (session info)
+            })
+            .then((response) => {
+                if (response.ok) {
+                    // Redirect to the home page on successful logout
+                    window.location.href = '/html/home.html';
+                } else {
+                    alert("Failed to log out. Please try again.");
+                }
+            })
+            .catch((error) => {
+                console.error('Error logging out:', error);
+            });
+        });
+    </script>
+
+</body>
+</html>

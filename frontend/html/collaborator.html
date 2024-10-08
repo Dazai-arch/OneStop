@@ -1,0 +1,466 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>Collaborators</title>
+    <script src="https://cdn.socket.io/4.8.0/socket.io.min.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="/css/collaborator.css">
+    <link rel="stylesheet" type="text/css" href="/css/sidebar.css">
+    <link rel="stylesheet" type="text/css" href="/css/card.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+    <!-- Include Socket.IO client library -->
+   
+</head>
+<body>
+    <div class="container">
+        <!-- Side Bar -->
+        <div class="sidebar">
+            <div class="logo">
+                <img src="/OneSTOPlogo.png" alt="OneSTOP Logo">
+            </div>
+            <button class="noselect" onclick="openPopup()">
+                <span class="text">Add</span>
+                <span class="icon"><span class="buttonSpan">+</span></span>
+            </button>
+    
+            <div id="projectPopup" class="popup">
+                <div class="popup-content">
+                    <span class="close" onclick="closePopup()">&times;</span>
+                    <h2>Add New Project</h2>
+                    <input type="text" id="newProjectName" placeholder="Enter Project Name">
+                    <div class="addb" onclick="addProject()">Add Project</div>
+                </div>
+            </div>
+            <button class="login-signup-btn" id="logout-btn">Log Out</button>
+            <ul class="menu">
+                <li>
+                    <img src="/dashboardpng.png" alt="Dashboard Icon" class="menu-icon">
+                    <span><a href="/html/dashboard.html">Dashboard</a></span>
+                </li>
+                <li>
+                    <img src="/projectspng.png" alt="Projects Icon" class="menu-icon">
+                    <span><a href="/html/project.html">Projects</a></span>
+                </li>
+                <li>
+                    <img src="/taskpng.png" alt="Tasks Icon" class="menu-icon">
+                    <span><a href="/html/tasks.html">Tasks</a></span>
+                </li>
+                <li>
+                    <img src="/ideaspng.png" alt="Ideas Icon" class="menu-icon">
+                    <span><a href="">Ideas</a></span>
+                </li>
+                <li>
+                    <img src="/collaboratorpng.png" alt="Collaborators Icon" class="menu-icon">
+                    <span><a href="#">Collaborators</a></span>
+                </li>
+            </ul>
+            <a href="/html/about.html">
+                <img src="/image 11.png" alt="Bottom Image" class="bottom-image">
+            </a>
+        </div>
+        
+        <div class="line">
+            <div class="vertical-rule"></div>
+        </div>
+        <!-- Side Bar Ends Here -->
+        
+        <div class="contact-list">
+            <h2 class="main-head">Collaborators</h2>
+            <ul class="list" id="collaboratorList">
+                <!-- Collaborators will be dynamically added here -->
+            </ul>
+
+            <div class="add-collaborator">
+                <img class="circle" src="/add.png" id="addCollaboratorBtn" alt="Add Collaborator">
+            </div>
+            <div id="collaboratorInputContainer"></div>       
+        </div>
+        <!-- Section 1 Completes Here -->
+
+        <div class="line">
+            <div class="vertical-rule"></div>
+        </div>
+        <!-- Section 2 Completes Here -->
+
+        <div class="team-tag">
+            <div class="details">
+                <h4 id="username"></h4>
+                <p id="designation"></p>
+            </div>
+            <div class="avatar"><a href="/html/proffile.html">
+                <img src="" alt="" id="profileimage"></a>
+            </div>
+        </div>
+        <!-- Profile Code -->
+        
+        <div class="chat-section">
+            <div class="horizontal-rule" style="margin-top: 75px;"></div>
+            <div class="chat-icon-section">
+                <img class="chat-icon" src="/collaboratorpng.png">
+                <span class="chat-name">Collaborative Chat</span>
+            </div>
+            <div class="horizontal-rule"></div>
+            <div id="allChatsContainer" class="all-chats-container"></div>
+            <div class="message-box">
+                <textarea class="message-placeholder" placeholder="Type your message here..."></textarea>
+                <img src="/sendicon.png" alt="sendicon" id="sendicon" class="send-button">
+                <img alt="File Icon" id="fileIcon" class="file-icon" src="/paperclip.png">
+                <input type="file" id="fileInput" class="file-input" style="display:none;">
+            </div>
+        </div>
+    </div>
+    <script src="/js/addotherpage.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() { 
+            const socket = io();
+        
+            let currentUserId, projectId, currentUserName;
+            const userMap = {}; // Mapping of user ID to username
+        
+            // Fetch user ID and project ID from session (on load)
+            fetch('/api/session-info')
+                .then(response => response.json())
+                .then(data => {
+                    currentUserId = data.userId;
+                    projectId = data.projectId;
+                    currentUserName = data.username;
+        
+                    if (!projectId || !currentUserId) {
+                        console.error('User ID or Project ID not found in session.');
+                        return;
+                    }
+        
+                    // Join the project room
+                    socket.emit('joinRoom', projectId); 
+                    console.log(`User ${currentUserId} joined room ${projectId} username ${currentUserName}`);
+                    fetchMessages();
+                })
+                .catch(error => console.error('Error fetching session info:', error));
+        
+            socket.on('connect', () => {
+                console.log('Connected to WebSocket server');
+            });
+        
+            socket.on('roomFull', (message) => {
+                alert(message); // Alert if the room is full
+            });
+        
+            socket.on('disconnect', () => {
+                console.log('Disconnected from WebSocket server');
+            });
+            fetch('/profile')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('username').textContent = data.username;
+                    document.getElementById('designation').textContent = data.designation;
+                    document.getElementById('profileimage').src = data.image;
+                })
+                .catch(error => console.error('Error fetching profile data:', error));
+
+                fetch('/api/get-selected-project')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        //fetchTasks(data.projectId);
+                    } else {
+                        alert('No project selected.');
+                        window.location.href = '/html/project.html';
+                    }
+                })
+                .catch(error => console.error('Error fetching selected project:', error));
+
+                fetch('/api/get-invitation-details') // Assume this endpoint returns stored session details
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const { projectId, email } = data.invitationDetails;
+
+                // Pre-fill the email input field
+                document.getElementById('emailInput').value = email; // Assuming you have an input with this ID
+                document.getElementById('invitationMessage').innerText = `You were invited to join project ID: ${projectId}. Please sign up.`;
+            }
+        })
+        .catch(error => console.error('Error fetching invitation details:', error));
+            // Fetch usernames (you need an endpoint to fetch user data)
+            async function fetchAndPopulateUsernames() {
+                try {
+                    const response = await fetch('/api/users'); // Implement this on your server
+                    const users = await response.json();
+        
+                    users.forEach(user => {
+                        userMap[user._id] = user.username; // Populate userMap with user data
+                    });
+                } catch (error) {
+                    console.error('Error fetching usernames:', error);
+                }
+            }
+        
+            // Call this function to load user data
+            fetchAndPopulateUsernames();
+        
+            // DOM elements
+            const addBtn = document.getElementById("addCollaboratorBtn");
+            const inputContainer = document.getElementById("collaboratorInputContainer");
+            const collaboratorList = document.getElementById("collaboratorList");
+            const fileIcon = document.getElementById("fileIcon");
+            const fileInput = document.getElementById("fileInput");
+            const allChatsContainer = document.getElementById("allChatsContainer");
+            const messageInput = document.querySelector(".message-placeholder");
+            const sendMessageBtn = document.querySelector(".send-button");
+        
+            let inputVisible = false;
+        
+            // Add event listener for collaborator button
+            addBtn.addEventListener("click", function() {
+                if (!inputVisible) {
+                    if (!document.getElementById("collaboratorEmailInput")) {
+                        let inputBox = document.createElement("input");
+                        inputBox.setAttribute("type", "email");
+                        inputBox.setAttribute("id", "collaboratorEmailInput");
+                        inputBox.setAttribute("placeholder", "Enter collaborator's email");
+                        inputBox.classList.add("styled-input");
+        
+                        inputContainer.appendChild(inputBox); 
+        
+                        inputBox.addEventListener("keydown", function(event) {
+                            if (event.key === "Enter") {
+                                let email = inputBox.value.trim();
+                                if (email) {
+                                    let collaboratorName = email.split("@")[0];
+                                    addCollaboratorToList(collaboratorName); // Add to the list
+                                    inputBox.value = ''; // Clear the input
+                        
+                                    // Send invitation email to the collaborator
+                                    fetch('/invite-collaborator', {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                        },
+                                        body: JSON.stringify({ projectId: projectId, collaboratorEmail: email }),
+                                    })
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        if (data.message) {
+                                            console.log(data.message); // Log success message
+                                            alert(data.message); // Show the message to the user
+                                        }
+                                    })
+                                    .catch(error => {
+                                        console.error('Error inviting collaborator:', error);
+                                        alert('Error inviting collaborator. Please try again.'); // Display a generic error message
+                                    });
+                        
+                                    inputBox.style.display = 'none'; // Hide input after adding
+                                    inputVisible = false; // Update visibility flag
+                                }
+                            }
+                        });
+                    } else {
+                        document.getElementById("collaboratorEmailInput").style.display = 'block';
+                    }
+                    inputVisible = true;
+                } else {
+                    document.getElementById("collaboratorEmailInput").style.display = 'none';
+                    inputVisible = false;
+                }
+            });
+            function fetchCollaborators() {
+                fetch(`/api/projects/collaborators`) // No project ID needed in the URL
+                    .then(response => response.json())
+                    .then(data => {
+                        const { collaborators, owner } = data; // Destructure the response
+            
+                        // Add owner to the list as a collaborator
+                        addCollaboratorToList(owner.username, owner.image, false, true); // true for isOwner
+            
+                        // Iterate over collaborators and add them to the list
+                        collaborators.forEach(collaborator => {
+                            // Pass false for isOwner since they are not the project owner
+                            addCollaboratorToList(collaborator.username, collaborator.image, collaborator.invitationSent, false);
+                        });
+                    })
+                    .catch(error => console.error('Error fetching collaborators:', error));
+            }
+            
+            fetchCollaborators();
+            // Add collaborator to the list
+            function addCollaboratorToList(name, imageUrl, invitationSent = false, isAlreadyCollaborator = false) {
+                let listItem = document.createElement("li");
+                listItem.classList.add("list-items");
+            
+                // Determine the status message based on the collaborator's status
+                let statusMessage;
+                if (isAlreadyCollaborator) {
+                    statusMessage = "Owner"; // Message for existing collaborators
+                } else if (invitationSent) {
+                    statusMessage = "Invitation Sent"; // Message for invited collaborators
+                } else {
+                    statusMessage = "Collab"; // Default message for new collaborators
+                }
+            
+                listItem.innerHTML = `
+                    <div class="profile-icon">
+                        <img src="${imageUrl || '/collaboratorpng.png'}" alt="Profile Photo" class="circle"> <!-- Default image if none provided -->
+                    </div>
+                    <div>
+                        <span class="profile-name">${name}</span><br>
+                        <span class="profile-msg">${statusMessage}</span>
+                    </div>
+                `;
+                collaboratorList.appendChild(listItem);
+            }
+            
+        
+            // Handle file uploads
+            fileIcon.addEventListener("click", function() {
+    fileInput.click();
+});
+
+fileInput.addEventListener("change", function(event) {
+    const file = event.target.files[0]; // Get the selected file
+    if (file) {
+        const formData = new FormData(); // Create a FormData object
+        formData.append('file', file); // Append the file to the FormData
+
+        // Upload file to the server
+        fetch('/upload-file', {
+            method: 'POST',
+            body: formData // Send the FormData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.filePath) { // Check if filePath is included in the response
+                console.log("File uploaded successfully:", data.filePath);
+
+                //const fileName = data.filePath.split('/').pop(); // Extract file name
+                const fileName = data.fileName;
+                const downloadUrl = `/uploads/${fileName}`;
+
+                // Emit message with file path and username
+                socket.emit('sendMessage', { 
+                    roomId: projectId, 
+                    userId: currentUserId, 
+                    userName: currentUserName,
+                    messageText: `File uploaded: <a href="${downloadUrl}" download>${fileName}</a>`, 
+                    filePath: data.filePath ,
+                    fileName: fileName
+                });
+
+                // Display the uploaded file in the chat immediately
+                displayFileInChat(data.filePath, currentUserId, fileName, currentUserName);
+            } else {
+                console.error('File path not returned:', data); // Log the whole response if no file path
+            }
+        })
+        .catch(error => console.error('Error uploading file:', error));
+    }
+});
+
+// Display file in chat (aligns message to the right for sender)
+function displayFileInChat(filePath, userId, fileName, userName) {
+    const messageElement = document.createElement("div");
+    messageElement.classList.add("message", "right");
+
+    //const fileName = filePath.split('/').pop(); // Get just the filename
+    const downloadLink = `/uploads/${fileName}`; // Ensure the correct root-relative path for the link
+
+    // Create the HTML with the download link
+    messageElement.innerHTML = `<strong>${userName}:</strong> Download File: <a href="${downloadLink}" download class='fileanchor'>${fileName}</a>`;
+
+    allChatsContainer.appendChild(messageElement);
+    allChatsContainer.scrollTop = allChatsContainer.scrollHeight; // Auto-scroll to the bottom
+}
+            
+function fetchMessages() {
+    fetch(`/api/messages/${projectId}`) 
+        .then((response) => response.json())
+        .then((messages) => {
+            messages.forEach((message) => {
+                const username = message.sender.username;
+                const userId = message.sender._id; // Assuming message sender info includes userId
+                const filePath = message.filePath;
+                const fileName = message.fileName;
+
+                if (filePath) {
+                    const downloadUrl = `/uploads/${fileName}`;
+                    addMessageToChat(`Download File:<a href="${downloadUrl}" class="fileanchor"> ${fileName}</a>`, userId, username);
+                } else {
+                    addMessageToChat(message.text, userId, username);
+                }
+            });
+        })
+        .catch((error) => console.error("Error fetching messages:", error));
+}
+            
+            // Handle sending messages
+            sendMessageBtn.addEventListener("click", function() {
+                const message = messageInput.value.trim();
+                if (message) {
+                    socket.emit('sendMessage', { roomId: projectId, messageText: message, userId: currentUserId, username: currentUserName}); 
+                    addMessageToChat(message, currentUserId, currentUserName);
+                    messageInput.value = '';
+                }
+            });
+        
+            // Add message to chat
+            
+        
+            // Handle receiving messages
+            socket.on('receiveMessage', (data) => {
+                const { messageText, userId, filePath, fileName } = data;
+                
+                // Use userMap to get the username
+                const username = userMap[userId] || 'Unknown User'; 
+            
+                // Check if the message was sent by the current user
+                const isCurrentUser = userId === currentUserId;
+            
+                // If there's a file
+                if (filePath) {
+                    const downloadLink = `/uploads/${fileName}`;
+                    addMessageToChat(`File uploaded: <a href="${downloadLink}" class="fileanchor">${fileName}</a>`, isCurrentUser ? "right" : "left", username);
+                } else {
+                    // For text messages
+                    addMessageToChat(messageText, isCurrentUser ? "right" : "left", username);
+                }
+            });
+
+            function addMessageToChat(message, userId, user) {
+                const messageElement = document.createElement("div");
+                
+                // Check if the message is from the current user
+                const alignmentClass = userId === currentUserId ? "right" : "left";
+                
+                // Apply the class for alignment and add message content
+                messageElement.classList.add("message", alignmentClass);
+                messageElement.innerHTML = `<strong>${user}:</strong> ${message}`;
+                
+                // Append the message to the chat container
+                allChatsContainer.appendChild(messageElement);
+                allChatsContainer.scrollTop = allChatsContainer.scrollHeight; // Auto-scroll to the bottom
+            }
+        });
+        
+        document.getElementById("logout-btn").addEventListener("click", function () {
+            fetch('/logout', {
+                method: 'POST', // Send a POST request for logout
+                credentials: 'include', // Include cookies (session info)
+            })
+            .then((response) => {
+                if (response.ok) {
+                    // Redirect to the home page on successful logout
+                    window.location.href = '/html/home.html';
+                } else {
+                    alert("Failed to log out. Please try again.");
+                }
+            })
+            .catch((error) => {
+                console.error('Error logging out:', error);
+            });
+        });
+        
+    </script>
+</body>
+</html>

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Verify Your Email</title>
+    <link rel="stylesheet" href="/css/forgot.css">
+</head>
+<body>
+    <img src="/OneSTOPlogo.png" alt="onestop-logo" class="logo" />
+    <div class="main">
+        <div id="reset">
+          <h1>Verify Your Email</h1>
+        </div>
+        <div class="head">
+          <h3>A verification code has been sent to your email. Please enter it below:</h3>
+        </div>
+        <div id="mform">
+            <input type="text" id="verificationCode" placeholder="Enter verification code" /><br>
+            <button id="verifyButton">Verify</button>
+        </div>
+      </div>
+
+
+    <script>
+        document.getElementById("verifyButton").addEventListener("click", function () {
+            const code = document.getElementById("verificationCode").value;
+        
+            // Check if the verification code is empty
+            if (!code) {
+                alert("Please enter the verification code.");
+                return; // Exit the function early if no code is entered
+            }
+        
+            fetch("/verify-code", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ code }),
+            })
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.success) {
+                    alert("Verification successful! Redirecting to login page...");
+                    sessionStorage.setItem("isVerified", true); // Set verification flag in session storage
+                    window.location.href = "/html/login.html"; // Redirect to login
+                } else {
+                    alert("Invalid code! Redirecting to signup page...");
+                    window.location.href = "/html/signup.html"; // Redirect to signup
+                }
+            })
+            .catch((error) => {
+                console.error("Error:", error);
+                alert("Something went wrong. Please try again.");
+            });
+        });
+        
+
+        window.addEventListener("beforeunload", function (event) {
+            // Check if user is not verified before sending delete request
+            if (!sessionStorage.getItem("isVerified")) {
+                fetch("/delete-user-data", {
+                    method: "DELETE",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ reason: "User closed the tab/browser" }),
+                });
+            }
+        });
+
+    </script>
+</body>
+</html>

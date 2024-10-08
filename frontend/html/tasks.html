@@ -1,54 +1,422 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>sidebar</title>
-    <link rel="stylesheet" href="/css/task.css" />
-  </head>
-  <body>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OneSTOP Dashboard</title>
+    <script src="https://cdn.socket.io/4.8.0/socket.io.min.js"></script>
+
+    <link rel="stylesheet" href="/css/task.css">
+</head>
+<body>
     <div class="sidebar">
-      <div class="logo">
-        <img src="/OneSTOPlogo.png" alt="OneSTOP Logo" />
-      </div>
+        <div class="logo"><img src="/OneSTOPlogo.png" alt="OneSTOP Logo"></div>
+        
+        <button class="noselect" onclick="openPopup()">
+            <span class="text">Add</span>
+            <span class="icon"><span class="buttonSpan">+</span></span>
+        </button>
+        
+        <button class="login-signup-btn" id="logout-btn">Logout</button>
+        
+        <ul class="menu">
+            <li>
+                <img src="/dashboardpng.png" alt="Dashboard Icon" class="menu-icon">
+                <span><a href="/html/dashboard.html">Dashboard</a></span>
+            </li>
+            <li>
+                <img src="/projectspng.png" alt="Projects Icon" class="menu-icon">
+                <span><a href="/html/project.html">Projects</a></span>
+            </li>
+            <li>
+                <img src="/taskpng.png" alt="Tasks Icon" class="menu-icon">
+                <span><a href="#">Tasks</a></span>
+            </li>
+            <li>
+                <img src="/ideaspng.png" alt="Ideas Icon" class="menu-icon">
+                <span><a href="">Ideas</a></span>
+            </li>
+            <li>
+                <img src="/collaboratorpng.png" alt="Collaborators Icon" class="menu-icon">
+                <span><a href="/html/collaborator.html">Collaborators</a></span>
+            </li>
 
-      <button class="noselect">
-        <span class="text">Add</span>
-        <span class="icon"><span class="buttonSpan">+</span></span>
-      </button>
-
-      <button class="login-signup-btn">Login/Signup</button>
-
-      <ul class="menu">
-        <li>
-          <img src="/dashboardpng.png" alt="Dashboard Icon" class="menu-icon" />
-          <span><a href="">Dashboard</a></span>
-        </li>
-        <li>
-          <img src="/projectspng.png" alt="Projects Icon" class="menu-icon" />
-          <span><a href="">Projects</a></span>
-        </li>
-        <li>
-          <img src="/taskpng.png" alt="Tasks Icon" class="menu-icon" />
-          <span><a href="">Tasks</a></span>
-        </li>
-        <li>
-          <img src="/ideaspng.png" alt="Ideas Icon" class="menu-icon" />
-          <span><a href="">Ideas</a></span>
-        </li>
-        <li>
-          <img
-            src="/collaboratorpng.png"
-            alt="Collaborators Icon"
-            class="menu-icon"
-          />
-          <span><a href="">Collaborators</a></span>
-        </li>
-      </ul>
-
-      <a href="">
-        <img src="/image 11.png" alt="Bottom Image" class="bottom-image" />
-      </a>
+            <a href=""><img src="/image 11.png" alt="Bottom Image" class="bottom-image"></a>
+        </ul>
     </div>
-  </body>
+    
+    
+    <div class="main-content">
+        <div class="container">
+            <div class="header">
+                <h1>Tasks</h1>
+                <div class="team-tag">
+                  <div class="details">
+                      <h4 id="username"></h4>
+                      <p id="designation"></p>
+                  </div>
+                  <div class="avatar"><a href="/html/proffile.html">
+                      <img src="" alt="" id="profileimage"></a>
+                  </div>
+              </div>
+                
+            </div>
+            <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Assignee</th>
+                        <th>Status</th>
+                        <th>Due Date</th>
+                        <th>Impact</th>
+                      <th>Budget</th>
+                      <th><div id="addTaskBtn" class="add-task-btn">+</div></th>
+                    </tr>
+                </thead>
+              
+                <tbody id="taskTableBody">
+    
+                </tbody>
+                
+            </table>
+      </div>
+        </div>
+    
+    
+        <div id="taskModal" class="modal">
+            <div class="modal-content">
+                <span class="close" id="closeModal">&times;</span>
+                <h2 id="modalTitle">Add Task</h2>
+                <form id="taskForm">
+                    <label for="taskName">Task Name:</label>
+                    <input type="text" id="taskName" required>
+    
+                    <label for="assignee">Assignee:</label>
+                    <input type="text" id="assignee" required>
+    
+                    <label for="status">Status:</label>
+                    <select id="status">
+                        <option value="New">New</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Completed">Completed</option>
+                        <option value="Planned">Planned</option>
+                    </select>
+    
+                    <label for="dueDate">Due Date:</label>
+                    <input type="date" id="dueDate" required>
+    
+                    <label for="impact">Impact:</label>
+                    <select id="impact">
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                    </select>
+    
+                   <!-- Budget field in the form -->
+    <label for="budgetCurrency">Budget:</label>
+    <div class="budget-input">
+        <select id="currencySymbol">
+            <option value="₹">INR (₹)</option>
+            <option value="$">USD ($)</option>
+            <option value="€">EUR (€)</option>
+            <option value="£">GBP (£)</option>
+            <option value="¥">JPY (¥)</option>
+            <option value="₩">KRW (₩)</option>
+            <option value="₽">RUB (₽)</option>
+            <option value="₣">CHF (₣)</option>
+            <option value="R$">BRL (R$)</option>
+            <option value="C$">CAD (C$)</option>
+            <option value="A$">AUD (A$)</option>
+            <option value="₱">PHP (₱)</option>
+            <option value="₪">ILS (₪)</option>
+            <option value="฿">THB (฿)</option>
+            <!-- Add more currencies as needed -->
+        </select>
+        <input type="number" id="budgetAmount" placeholder="Enter amount" required min="0">
+    </div>
+    
+    
+                    <button type="submit" id="saveTaskBtn">Save Task</button>
+                </form>
+            </div>
+        </div>
+    
+        
+        </div>
+       
+
+    <!-- Popup window for adding new project -->
+    <div id="projectPopup" class="popup">
+        <div class="popup-content">
+            <span class="close" onclick="closePopup()">&times;</span>
+            <h2>Add New Project</h2>
+            <input type="text" id="newProjectName" placeholder="Enter Project Name">
+            <div class="addb" onclick="addProject()">Add Project</div>
+        </div>
+    </div>
+    <script src="/js/addotherpage.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const socket = io();
+        socket.on('connect', () => {
+            console.log('Connected to Socket.IO server');
+        })
+        socket.on('taskUpdated', (updatedTask) => {
+            console.log("Task updated:", updatedTask);
+            updateTaskInUI(updatedTask); // Implement this function to update the UI
+        });
+
+        function updateTaskInUI(updatedTask) {
+            // Find the task element in the DOM
+            const taskElement = document.querySelector(`.task[data-id='${updatedTask._id}']`);
+            if (taskElement) {
+                // Update the task's properties in the UI
+                taskElement.textContent = updatedTask.title;
+                const statusElement = taskElement.querySelector('.task-status'); // Assuming you have a span for status
+    if (statusElement) {
+        statusElement.textContent = updatedTask.status; // Update the status text
+        // You may also want to apply styles based on the new status
+        statusElement.className = `task-status ${updatedTask.status.toLowerCase().replace(' ', '-')}`; // Update status class
+    } else {
+        console.warn("Status element not found for task:", updatedTask._id);
+    } // Update title
+                // Update additional properties as needed
+                // You might also want to update status, assignee, etc.
+            } else {
+                console.warn("Task element not found in the UI.");
+            }
+        }
+
+
+        function formatDate(dateString) {
+          const date = new Date(dateString);
+          const day = String(date.getDate()).padStart(2, '0'); // Get the day with leading zero
+          const month = String(date.getMonth() + 1).padStart(2, '0'); // Get the month (0-indexed) with leading zero
+          const year = date.getFullYear(); // Get the year
+          return `${day}/${month}/${year}`; // Format the date as DD/MM/YYYY
+      }
+      fetch('/profile')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('username').textContent = data.username;
+                    document.getElementById('designation').textContent = data.designation;
+                    document.getElementById('profileimage').src = data.image;
+                })
+                .catch(error => console.error('Error fetching profile data:', error));
+        const tasks = [];
+        const taskModal = document.getElementById('taskModal');
+        const addTaskBtn = document.getElementById('addTaskBtn');
+        const saveTaskBtn = document.getElementById('saveTaskBtn');
+        const closeModalBtn = document.getElementById('closeModal');
+        let editingTaskIndex = null; // Track if you're editing a task or adding a new one
+        const today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
+        document.getElementById('dueDate').setAttribute('min', today);
+
+        // Fetch tasks on load
+        function fetchTasks() {
+            fetch('/api/tasks')
+                .then(response => response.json())
+                .then(data => {
+                    tasks.length = 0; // Clear existing tasks
+                    tasks.push(...data); // Populate tasks array
+                    renderTasks(); // Populate tasks table
+                })
+                .catch(error => console.error('Error fetching tasks:', error));
+        }
+        fetch('/api/get-selected-project')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        fetchTasks(data.projectId);
+                    } else {
+                        alert('No project selected.');
+                        window.location.href = '/html/project.html';
+                    }
+                })
+                .catch(error => console.error('Error fetching selected project:', error));
+        function normalizeStatus(status) {
+          switch (status.toLowerCase()) {
+              case 'new':
+                  return 'New';
+              case 'in-progress':
+                  return 'In Progress';
+              case 'completed':
+                  return 'Completed';
+              case 'planned':
+                  return 'Planned';
+              default:
+                  return status; // Return the original status if it doesn't match
+          }
+      }
+
+        function renderTasks() {
+          const taskTableBody = document.getElementById('taskTableBody');
+          taskTableBody.innerHTML = ''; // Clear the table body
+          tasks.forEach((task, index) => {
+              const row = document.createElement('tr');
+              row.innerHTML = `
+                  <td>${task.title}</td>
+                  <td>${task.assignee || 'N/A'}</td>
+                  <td>${normalizeStatus(task.status)}</td>
+                  <td>${task.dueDate ? formatDate(task.dueDate) : 'N/A'}</td>
+                  <td>${task.impact || 'N/A'}</td>
+                  <td>${task.budget || 'N/A'}</td>
+                  <td>
+                    <div class="button-container"> 
+                      <button class="editBtn" data-index="${index}">Edit</button>
+                      <button class="deleteBtn" data-index="${index}">Delete</button>
+                    </div>
+                    </td>
+              `;
+              taskTableBody.appendChild(row);
+          });
+      }
+
+        // Add or Update Task
+        saveTaskBtn.addEventListener('click', (event) => {
+            event.preventDefault();
+            
+            const taskData = {
+                title: document.getElementById('taskName').value,
+                assignee: document.getElementById('assignee').value.trim(), // Wrap in an array of objects
+                status: document.getElementById('status').value,
+                dueDate: document.getElementById('dueDate').value,
+                impact: document.getElementById('impact').value,
+                budget: `${document.getElementById('currencySymbol').value} ${document.getElementById('budgetAmount').value}`
+            };
+
+            if (editingTaskIndex !== null) {
+                // Update existing task
+                const taskId = tasks[editingTaskIndex]._id;
+                fetch(`/api/tasks/${taskId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(taskData)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    tasks[editingTaskIndex] = data.task; // Update the task in the local array
+                    renderTasks(); // Re-render the tasks
+                    taskModal.style.display = 'none'; // Close the modal
+                })
+                .catch(error => console.error('Error updating task:', error));
+            } else {
+                // Add new task
+                fetch('/api/tasks', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(taskData)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    tasks.push(data.task); // Add new task to the local array
+                    renderTasks(); // Re-render the tasks
+                    taskModal.style.display = 'none'; // Close the modal
+                }).then(updatedTask => {
+                    socket.emit('taskUpdated', updatedTask); // Emit updated task to other clients
+                })
+                .catch(error => console.error('Error adding task:', error));
+            }
+        });
+
+        // Delete task
+        function deleteTask(index) {
+            const taskId = tasks[index]._id;
+            fetch(`/api/tasks/${taskId}`, { method: 'DELETE' })
+                .then(response => {
+                    if (response.ok) {
+                        tasks.splice(index, 1); // Remove task from local array
+                        renderTasks(); // Re-render the task table
+                    }
+                })
+                .catch(error => console.error('Error deleting task:', error));
+        }
+
+        // Open modal for new task
+        addTaskBtn.addEventListener('click', () => {
+            document.getElementById('taskForm').reset(); // Clear form inputs
+            editingTaskIndex = null; // Reset to indicate adding a new task
+            taskModal.style.display = 'flex'; // Show modal
+        });
+
+        // Close modal
+        closeModalBtn.addEventListener('click', () => {
+            taskModal.style.display = 'none';
+        });
+
+        // Event listeners for edit and delete buttons
+        document.getElementById('taskTableBody').addEventListener('click', (event) => {
+            if (event.target.classList.contains('editBtn')) {
+                const index = event.target.dataset.index;
+                const task = tasks[index];
+
+                document.getElementById('taskName').value = task.title;
+                document.getElementById('assignee').value = task.assignee; // Populate assignees
+                document.getElementById('status').value = task.status;
+                document.getElementById('dueDate').value = task.dueDate;
+                const budget = task.budget || 'N/A';
+                let currency = '';
+                let amount = '';
+
+              if (budget !== 'N/A') {
+                  [currency, amount] = budget.split(' '); // Split the budget into currency and amount
+              } else {
+                amount = '0'; // Default amount if budget is 'N/A'
+              }
+              document.getElementById('currencySymbol').value = currency;
+              document.getElementById('budgetAmount').value = amount;
+
+                editingTaskIndex = index; // Set index for editing
+                taskModal.style.display = 'flex'; // Show modal for editing
+            }
+
+            if (event.target.classList.contains('deleteBtn')) {
+                const index = event.target.dataset.index;
+                deleteTask(index);
+            }
+        });
+
+        fetchTasks(); // Fetch tasks when the page loads
+        document.getElementById('budgetAmount').addEventListener('input', function(event) {
+          if (this.value < 0) {
+              this.value = 0; 
+          }
+      });
+
+      // Additional validation on form submission
+      document.getElementById('taskForm').addEventListener('submit', function(event) {
+          const budgetValue = parseFloat(document.getElementById('budgetAmount').value);
+          if (budgetValue < 0) {
+              event.preventDefault(); // Prevent form submission
+              alert("Budget cannot be negative.");
+          }
+      })
+    });
+    document.getElementById("logout-btn").addEventListener("click", function () {
+      fetch('/logout', {
+          method: 'POST', // Send a POST request for logout
+          credentials: 'include', // Include cookies (session info)
+      })
+      .then((response) => {
+          if (response.ok) {
+              // Redirect to the home page on successful logout
+              window.location.href = '/html/home.html';
+          } else {
+              alert("Failed to log out. Please try again.");
+          }
+      })
+      .catch((error) => {
+          console.error('Error logging out:', error);
+      });
+  });
+    </script>
+    
+    
+    
+    
+                
+        
+    </script>
+</body>
 </html>
