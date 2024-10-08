@@ -25,7 +25,7 @@ document
 
       if (response.ok) {
         // Redirect on successful login
-        //window.location.href = '../html/home.html'; // Redirect to your dashboard or home page
+        window.location.href='/html/project.html'; // Redirect to your dashboard or home page
       } else {
         // Show error message
         alert(result.message || "Login failed.");

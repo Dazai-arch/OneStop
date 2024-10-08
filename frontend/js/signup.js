@@ -34,13 +34,13 @@ async function validateForm(event) {
   }
 
   // Phone number validation
-  let phone = document.getElementById("phoneno").value;
-  if (phone === "") {
-    window.alert("Please enter your phone number");
-    return false;
-  } else {
-    document.getElementById("err4").innerHTML = "";
-  }
+  // let phone = document.getElementById("phoneno").value;
+  // if (phone === "") {
+  //   window.alert("Please enter your phone number");
+  //   return false;
+  // } else {
+  //   document.getElementById("err4").innerHTML = "";
+  // }
 
   // Password validation
   let password = document.getElementById("password").value;
@@ -56,7 +56,7 @@ async function validateForm(event) {
     document.getElementById("err5").innerHTML = "";
   }
 
-  sendDataToServer({ email, username, designation, phone, password });
+  sendDataToServer({ email, username, designation, password });
 }
 
 async function sendDataToServer(userData) {
@@ -82,3 +82,19 @@ async function sendDataToServer(userData) {
     console.error("Error:", error);
   }
 }
+
+
+document.addEventListener("DOMContentLoaded", () => {
+  fetch('/api/get-invitation-details') // This endpoint should return stored session details
+      .then(response => response.json())
+      .then(data => {
+          if (data.success) {
+              const { projectId, email } = data.invitationDetails;
+
+              // Pre-fill the email input field
+              document.getElementById('emailInput').value = email; // Assuming you have an input with this ID
+              document.getElementById('invitationMessage').innerText = `You were invited to join project ID: ${projectId}. Please sign up.`;
+          }
+      })
+      .catch(error => console.error('Error fetching invitation details:', error));
+});

@@ -17,6 +17,7 @@ document.querySelectorAll(".section img").forEach((img) => {
 });
 
 // Handle the submit button click
+// Handle the submit button click
 document.getElementById("submit").addEventListener("click", function () {
   if (selectedImagePath === "") {
     alert("Please select an image!");
@@ -29,7 +30,7 @@ document.getElementById("submit").addEventListener("click", function () {
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ imagePath: selectedImagePath }), // Send selected image path to the server
+    body: JSON.stringify({ imagePath: selectedImagePath }),
   })
     .then((response) => {
       if (!response.ok) {
@@ -40,9 +41,24 @@ document.getElementById("submit").addEventListener("click", function () {
     .then((data) => {
       if (data.message === "Profile image saved!") {
         alert("Profile image saved successfully!");
-        window.location.href = "/html/login.html"; // Redirect to login page after saving
+
+        // Call the send-verification-code endpoint
+        return fetch("/send-verification-code", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
       } else {
         alert("Error saving profile image!");
+      }
+    })
+    .then((response) => {
+      if (response && response.ok) {
+        alert("Verification code sent to your email!");
+        window.location.href = "/html/emailverify.html"; // Redirect to email verification page
+      } else {
+        alert("Error sending verification code!");
       }
     })
     .catch((error) => {
