@@ -44,7 +44,7 @@ input{
     font-size: 20px;
     padding-left: 20px;
     border: solid 2px black;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2)
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 button{
     background-color: rgba(0, 0, 0, 0.1);
@@ -62,3 +62,13 @@ button:hover{
 }
 
 
+@media (max-width: 540px) {
+    h3{
+        font-size: 15px;
+    }
+    input{
+        height: 57px;
+        width: 450px;
+        font-size: 20px;
+    }
+}

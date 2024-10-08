@@ -1,0 +1,532 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+
+  display: flex;
+}
+
+.sidebar {
+  width: 250px;
+  background-color: rgba(247, 247, 247, 1);
+  color: #000000;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  box-sizing: border-box;
+}
+
+.logo img {
+  width: 232px;
+  height: 302px;
+  margin-bottom: -119px;
+  margin-top: -84px;
+  margin-left: -39px;
+}
+
+.new-project-btn, .login-signup-btn {
+  background-color: #000000;
+  color: white;
+  border: none;
+  padding: 10px;
+  margin: 10px 0;
+  cursor: pointer;
+  border-radius: 41px;
+}
+
+.menu {
+  list-style-type: none;
+  padding: 0;
+}
+
+.menu li {
+  margin: 15px 0;
+  cursor: pointer;
+}
+
+.main-content {
+  flex: 1;
+  padding-left: 80px;
+  padding-right: 80px;
+  padding-top: 50px;
+  padding-bottom: 50px;
+}
+
+.card {
+  background-color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 15px;
+  padding: 50px;
+  margin-bottom: 20px;
+  width: 1000px;
+  height: 400px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-top: 36px;
+}
+.card h3 {
+  margin-bottom: 10px;
+  color: #666;
+}
+
+.card p {
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+}
+
+.project-summary, .tasks-progress {
+  margin: 20px 0;
+}
+
+.project-summary table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.project-summary th, .project-summary td {
+  padding: 10px;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+
+.tasks-progress {
+  display: flex;
+  justify-content: space-between;
+}
+
+.task-list, .overall-progress, .workload {
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 20px;
+  width: 30%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.progress-circle {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  border: 10px solid #ff0000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 24px;
+  color: #333;
+}
+
+button {
+  width: 150px;
+  height: 50px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  background: black;
+  border: none;
+  border-radius: 40px;
+  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.15);
+  background: black;
+
+}
+
+button,
+button span {
+  transition: 200ms;
+}
+
+button .text {
+  transform: translateX(35px);
+  
+  transform: translateX(35px);
+  color: white;
+  text-align: inherit;
+  font-weight: bold;
+  padding-right: 75px;
+}
+
+button .icon {
+  position: absolute;
+  border-left: 1px solid #ffffff00;
+  transform: translateX(110px);
+  height: 40px;
+  width: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+
+button:hover {
+  background: red;
+}
+
+button:active {
+  background: white;
+}
+
+button:hover .text {
+  color: transparent;
+}
+
+button:hover .icon {
+  width: 150px;
+  border-left: none;
+  transform: translateX(0);
+}
+
+button:focus {
+  outline: none;
+}
+
+button:active .icon svg {
+  transform: scale(0.8);
+}
+
+.buttonSpan {
+  color: white;
+  margin: 150px;
+  font-size: 30px;
+}
+
+
+
+.menu {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.menu li {
+  display: flex;
+  align-items: center;
+  padding: 10px 0;
+  cursor: pointer;
+}
+
+.menu li:hover {
+  background-color: #f0f0f0;
+}
+.menu li:active{
+color: #b30021;
+}
+
+
+.menu-icon {
+  width: 24px;
+  height: 24px;
+  margin-right: 10px;
+}
+
+.menu span {
+  font-size: 16px;
+  color: #333;
+}
+
+.sidebar {
+  width: 250px;
+  background-color: #fff;
+  padding: 20px;
+  height: 100vh;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.noselect, .login-signup-btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+  margin-bottom: 20px;
+  background-color: #000000;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;}
+
+.noselect:hover, .login-signup-btn:hover {
+  background-color: #b30021;
+}
+
+.bottom-image{
+position: absolute;
+bottom: 15px;
+
+}
+
+.sidebar a {
+text-decoration: none; 
+font-family: 'Arial', sans-serif; 
+color: #333; 
+}
+
+.sidebar a:hover {
+color: #ff0022; 
+text-decoration: none; 
+}
+.profile-card {
+display: flex;
+align-items: center;
+background-color: #e0e0e0;
+border-radius: 206px;
+padding: 10px;
+padding-right: 15px;
+padding-bottom: 0px;
+max-width: 300px;
+box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+padding-top: 0px;
+padding-left: 0px;
+}
+
+.profile-pic img {
+width: 50px;
+height: 50px;
+border-radius: 50%;
+}
+
+.profile-info {
+margin-left: 15px;
+}
+
+.name {
+font-size: 14px;
+font-weight: bold;
+color: #333;
+padding-right: 55px;
+}
+
+.role {
+font-size: 13px;
+  color: #777;
+}
+
+
+#profileimage{
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: #ff0000 2px solid;
+}
+
+.pdetails {
+  display: flex;
+  flex-wrap: wrap; /* Allows wrapping to a new line */
+  gap: 20px; /* Add some gap between the elements */
+  width: 70%; /* Keep the reduced width for the details section */
+}
+
+.pdetails .user,
+.pdetails .designation,
+.pdetails .email,
+.pdetails .Created\ Date {
+  margin-bottom: 15px;
+  width: 48%; /* Ensure that two elements fit side by side */
+}
+
+.pdetails .user,
+.pdetails .designation {
+  width: calc(50% - 10px); /* Makes the user and designation take 50% width and fit in the same row */
+}
+
+.pdetails .email,
+.pdetails .Created\ Date {
+  width: calc(50% - 10px); /* Ensures email and Created Date also take 50% width and fit in the same row */
+}
+
+
+label {
+  font-weight: bold;
+  margin-bottom: 5px;
+  display: block;
+}
+
+input {
+  width: 300px;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 14px;
+  background-color: #f0f0f0;
+}
+
+input[readonly] {
+  background-color: white;
+  cursor: not-allowed;
+}
+
+
+
+
+
+
+
+.container {
+  text-align: center;
+  padding: 20px;
+  width: 100%;
+  margin-top: -25vh;
+}
+
+header h1 {
+  font-size: 104px;
+  color: black;
+  margin-bottom: 10px;
+  font-family: sans-serif;
+  font-weight: lighter;
+}
+
+header h1 span {
+  color: red;
+}
+
+.you img{
+  height: 20px;
+}
+header p {
+  font-size: 23px;
+  color: #666;
+  margin-bottom: 40px;
+  font-style: italic;
+}
+
+
+
+.team {
+  display: flex;
+  justify-content: center; 
+  gap: 20px;
+  flex-wrap: wrap; 
+}
+
+.member {
+  background-color: #828282;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  width: 220px; 
+  text-align: center;
+  transition: transform 0.3s ease; 
+}
+
+.member img {
+  width: 100%;
+  height: 256px;
+  object-fit: cover;
+  border-radius: 10px;
+  margin-bottom: 15px;
+}
+
+.member h3 {
+  font-size: 1.2em;
+  margin-bottom: 10px;
+}
+
+/* Social Icons */
+.social a {
+  text-decoration: none;
+  color: #333;
+  font-size: 1.5em;
+  margin: 0 10px;
+}
+
+.social a:hover {
+  color: red;
+}
+.logout{
+  background-color: black;
+    border: 0;
+    height: 2em;
+    width: 8em;
+    padding: 7px 32px;        
+    color: #ffffff;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: medium;
+    outline: none;
+    margin: 10px;
+}
+.popup {
+  display: none; 
+  position: fixed; 
+  z-index: 1; 
+  left: 0;
+  top: 0;
+  width: 100%; 
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4); 
+  backdrop-filter: blur(5px);
+}
+
+.popup-content {
+  background-color: white;
+  margin: 15% auto; 
+  padding: 20px;
+  border: 1px solid #888;
+  width: 30%; 
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  cursor: pointer;
+}
+.noselect{
+  background-color: #000000;
+}
+h2 {
+    margin-bottom: 20px;
+    font-size: 22px;
+    color: #333;
+}
+
+input[type="text"] {
+    width: 90%;
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+}
+.addb {
+    background-color: #4f504f;
+    color: white;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 10px;
+}
+
+.addb:hover {
+    background-color: black;
+}
+/* Hover effect for member */
+.member:hover {
+  transform: scale(1.05);
+}
+  @media (max-width: 1024px) {
+    .sidebar {
+      width: 200px;
+    }
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 150px;
+      }
+    }
+      @media (max-width: 480px) {
+        .sidebar {
+          width: 120px;
+        }
+    }
+}

@@ -32,6 +32,7 @@ body{
     overflow: hidden;
     left: 10%;
     position: relative;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 #head{
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
@@ -127,7 +128,7 @@ button:hover{
         height: 350px;
         gap: 10px;
         left: 3%;
-        margin-top: 50px;
+        margin-top: 25px;
     }
     #head{
         font-size: 20px;
@@ -152,10 +153,14 @@ button:hover{
     .fpass{
         font-size: 15px;
     }
+    .logo{
+        position: relative;
+        z-index: 2;
+    }
     #lsbanner{
         height: 100%;
         width: 100%;
-        opacity: 0.6;
+        opacity: 80%;
     }
 }
 

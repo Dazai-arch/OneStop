@@ -1,0 +1,247 @@
+*{
+    margin: 0px;
+    padding: 0px;
+    font-family: "Inter";
+}
+.container{
+    overflow: hidden;
+}
+
+.circle {
+    border-radius: 50%;
+    overflow: hidden;
+    width: 54px; 
+    height: 54px; 
+    
+  }
+
+.list{
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.list-items{
+    display: flex;
+    list-style: none;
+    align-items: center;
+    gap: 20px;
+    left: 10%;
+    position: relative;
+}
+.chat-section{
+    width:960px
+}
+.profile-name{
+    font-size: 24px;
+    font-weight: 500;
+    color: rgba(0, 0, 0, 0.7);
+    font-family: "Inter";
+}
+
+.profile-msg{
+    font-size: 16px;
+    color: rgba(0, 0, 0, 0.5);
+    font-weight: 500;
+    font-family: "Inter";
+}
+
+.main-head{
+    font-size: 50px;
+    font-weight: bold;
+    color: black;
+    font-family: "Inter";
+}
+
+.contact-list{
+    margin-left: 1px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    overflow: visible;
+}
+
+.add-collaborator{
+    margin-left: 123.5px;
+}
+
+.vertical-rule{
+    width: 2px;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.container{
+    display: flex;
+    flex-direction: row;
+}
+.line{
+    margin-left: 10px;
+}
+
+.horizontal-rule{
+    margin-top: 10px;
+    width: 100vw;
+    height: 2px;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.chat-icon{
+    margin-top: 10px;
+    margin-bottom: 10px;
+    margin-left: 10px;
+    border-radius: 50%;
+    overflow: hidden;
+    width: 58px; 
+    height: 58px; 
+    border: 2px solid black;
+}
+
+.chat-icon-section{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.chat-name{
+    font-size: 30px;
+    font-weight: 500;
+    color: rgba(0, 0, 0, 0.7);
+    font-family: "Inter";
+}
+
+.message-box{
+    display: flex;
+    width: 620px;
+    height: 55px;
+    background-color: rgba(217, 217, 217, 1);
+    border-radius: 149px;
+    text-align: center;
+    margin-top: 20px;
+    margin-left: 164px;
+    align-items: center;
+}
+
+.message-placeholder{
+    margin-left: 15px;
+    position: relative;
+    font-size: 15px;
+    color: rgb(0, 0, 0);
+    font-family: "Inter";
+    width: 500px;
+    background: none;
+    border: none;
+    height: 20px;
+    white-space: normal; /* Preserve new lines */
+    word-wrap: break-word;
+    overflow-y: hidden; /* Prevent vertical scrolling */
+    resize: none;
+    overflow-wrap: break-word;
+}
+
+.add-collaborator {
+    cursor: pointer;
+}
+
+#collaboratorInputContainer {
+    margin-top: 10px;
+}
+
+.styled-input {
+    display: block;
+    width: 290px;
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    margin-top: 10px;
+    font-family: 'Inter', sans-serif;
+}
+
+.message-placeholder:focus{
+    outline: none;
+}
+
+.btn-txt{
+    color: rgba(217, 217, 217, 1);
+    font-size: 22px;
+    margin-left: 45px;
+}
+
+.send-button{
+    height: 35px;
+}
+
+.file-icon{
+    cursor: pointer;
+    margin-left: 10px;
+    margin-top: 5px;
+    width: 34px;
+    height: 34px;
+    border: none;
+    /* background-color: #ccc; */
+    /* border-radius: 50%; */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.file-input {
+    display: none;
+}
+#sendicon{
+    width: 34px;
+    height: 34px;
+}
+
+.all-chats-container {
+    position: relative;
+    height: 480px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+.all-chats-container::-webkit-scrollbar {
+    display: none; /* For Chrome/Safari */
+}
+
+.chat-messages {
+    display: none; /* Initially hidden */
+    flex-direction: column;
+    margin: 10px;
+    height: 100%;
+}
+
+.chat-messages.active {
+    display: flex; /* Only active chat is visible */
+}
+
+.message {
+    padding: 10px;
+    border-radius: 10px;
+    max-width: 50%;
+    margin-bottom: 10px;
+    font-family: 'Inter', sans-serif;
+    word-break: break-word;
+}
+
+.message.right {
+    background-color: #4eff5693; /* Light green for user messages 4ce929a9*/
+    align-self: flex-end;
+}
+
+.fileanchor{
+    text-decoration: none;
+}
+.message.left {
+    background-color: #D6E9FF; /* Light grey for incoming messages #F1F0F0 */
+    align-self: flex-start;
+}
+.send-button:hover{
+    content: url('/send.png')
+}
+
+#addCollaboratorBtn:hover{
+    content: url('/plus.png');
+}

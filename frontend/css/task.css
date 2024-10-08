@@ -1,188 +1,642 @@
-body{
-  margin: 0;
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+
+    display: flex;
 }
+
 .sidebar {
-  width: 250px;
-  background-color: rgba(247, 247, 247, 1);
-  color: #000000;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  box-sizing: border-box;
+    width: 250px;
+    background-color: rgba(247, 247, 247, 1);
+    color: #000000;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    box-sizing: border-box;
 }
 
 .logo img {
-  width: 232px;
-  height: 302px;
-  margin-bottom: -119px;
-  margin-top: -84px;
-  margin-left: -39px;
+    width: 232px;
+    height: 302px;
+    margin-bottom: -119px;
+    margin-top: -84px;
+    margin-left: -39px;
 }
+
 .new-project-btn, .login-signup-btn {
-  background-color: #000000;
-  color: white;
-  border: none;
-  padding: 10px;
-  margin: 10px 0;
-  cursor: pointer;
-  border-radius: 41px;
+    background-color: #000000;
+    color: white;
+    border: none;
+    padding: 10px;
+    margin: 10px 0;
+    cursor: pointer;
+    border-radius: 41px;
 }
 
 .menu {
-  list-style-type: none;
-  padding: 0;
+    list-style-type: none;
+    padding: 0;
 }
 
 .menu li {
-  margin: 15px 0;
-  cursor: pointer;
+    margin: 15px 0;
+    cursor: pointer;
 }
+
+.main-content {
+    flex: 1;
+    padding: 20px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header h1 {
+    font-size: 40px;
+    color: #000000;
+    margin-top: -20px;
+ 
+}
+
+.user-info {
+    text-align: right;
+}
+
+.overview {
+    display: flex;
+    justify-content: space-between;
+    margin: 20px 0;
+}
+
+
+.card {
+  background-color: #D9D9D9;
+    border-radius: 36px;
+    padding: 20px;
+    margin-bottom: 20px;
+    width: 15%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-top: 36px;
+}
+
+.card:hover{
+background-color: #63626255;
+}
+
+.card h3 {
+    margin-bottom: 10px;
+    color: #666;
+}
+
+.card p {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+}
+
+
+
 button {
-  width: 150px;
-  height: 50px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  background: black;
-  border: none;
-  border-radius: 40px;
-  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.15);
-  background: black;
+    width: 150px;
+    height: 50px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    background: black;
+    border: none;
+    border-radius: 40px;
+    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.15);
+    background: black;
+    
 
-}
-
-button,
-button span {
-  transition: 200ms;
-}
-
-button .text {
-  transform: translateX(35px);
+  }
   
-  transform: translateX(35px);
-  color: white;
-  text-align: inherit;
-  font-weight: bold;
-  padding-right: 75px;
+  button,
+  button span {
+    transition: 200ms;
+  }
+  
+  button .text {
+    transform: translateX(35px);
+    
+    transform: translateX(35px);
+    color: white;
+    text-align: inherit;
+    font-weight: bold;
+    padding-right: 75px;
+  }
+  
+  button .icon {
+    position: absolute;
+    border-left: 1px solid #ffffff00;
+    transform: translateX(110px);
+    height: 40px;
+    width: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  
+  
+  button:hover {
+    background: red;
+  }
+  
+  button:active {
+    background: white;
+  }
+  
+  button:hover .text {
+    color: transparent;
+  }
+  
+  button:hover .icon {
+    width: 150px;
+    border-left: none;
+    transform: translateX(0);
+  }
+  
+  button:focus {
+    outline: none;
+  }
+  
+  button:active .icon svg {
+    transform: scale(0.8);
+  }
+  
+  .buttonSpan {
+    color: white;
+    margin: 150px;
+    font-size: 30px;
+  }
+  
+
+
+  .menu {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
 }
 
-button .icon {
+.menu li {
+    display: flex;
+    align-items: center;
+    padding: 10px 0;
+    cursor: pointer;
+}
+
+.menu li:hover {
+    background-color: #f0f0f0;
+}
+.menu li:active{
+  color: #b30021;
+}
+
+
+.menu-icon {
+    width: 24px;
+    height: 24px;
+    margin-right: 10px;
+}
+
+.menu span {
+    font-size: 16px;
+    color: #333;
+}
+
+.sidebar {
+    width: 250px;
+    background-color: #fff;
+    padding: 20px;
+    height: 100vh;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.noselect, .login-signup-btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    margin-bottom: 20px;
+    background-color: #000000;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;}
+
+.noselect:hover, .login-signup-btn:hover {
+    background-color: #b30021;
+}
+
+.bottom-image{
   position: absolute;
-  border-left: 1px solid #ffffff00;
-  transform: translateX(110px);
-  height: 40px;
-  width: 40px;
+  bottom: 15px;
+  
+}
+
+.sidebar a {
+  text-decoration: none; 
+  font-family: 'Arial', sans-serif; 
+  color: #333; 
+}
+
+.sidebar a:hover {
+  color: #ff0022; 
+  text-decoration: none; 
+}
+.profile-card {
   display: flex;
   align-items: center;
+  background-color: #e0e0e0;
+  border-radius: 206px;
+  padding: 10px;
+  padding-right: 15px;
+  padding-bottom: 0px;
+  max-width: 300px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  padding-top: 0px;
+  padding-left: 0px;
+}
+.profile-card:hover{
+  background-color: #78787892;
+}
+
+.profile-pic img {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+}
+
+.profile-info {
+  margin-left: 15px;
+}
+
+.name {
+  font-size: 14px;
+  font-weight: bold;
+  color: #333;
+  padding-right: 55px;
+}
+
+.role {
+  font-size: 13px;
+    color: #777;
+}
+
+
+.popup {
+  display: none; /* Hidden by default */
+  position: fixed; 
+  z-index: 1; 
+  left: 0;
+  top: 0;
+  width: 100%; 
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(5px);
+}
+
+.popup-content {
+  background-color: white;
+  margin: 15% auto; 
+  padding: 20px;
+  border: 1px solid #888;
+  width: 30%;
+  text-align: center;
+}
+
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  cursor: pointer;
+}
+.noselect{
+  background-color: #000000;
+}
+
+input[type="text"] {
+  width: 90%;
+  padding: 10px;
+  margin-bottom: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+}
+.addb {
+  background-color: #4f504f;
+  color: white;
+  padding: 10px 20px;
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-top: 10px;
+}
+
+.addb:hover {
+  background-color: #fdfffe;
+}
+
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 0;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    background-color: #f4f4f4;
+}
+thead{
+  position: sticky;
+  top: 0;
+}
+.table-container{
+  max-height: 550px;
+  overflow-y: auto;
+}
+
+.table-container::-webkit-scrollbar {
+  width: 4px; /* Adjust the width of the scrollbar */
+}
+
+.table-container::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.5); /* Customize scrollbar thumb */
+  border-radius: 10px; /* Rounded corners */
+}
+
+.table-container::-webkit-scrollbar-track {
+  background: transparent; /* Hide the track */
+}
+
+.table-container::-webkit-scrollbar-button {
+  display: none; /* This hides the arrows */
+}
+
+
+
+
+
+.add-task-btn {
+    
+    color:rgb(255, 0, 0);
+    display: contents;
+    width: 40px;
+    height: 40px;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0, 0, 0); /* Fallback color */
+  background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
+  display: flex;
   justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background-color: #fefefe;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 60%; /* Adjust width as necessary */
+  max-width: 400px; /* Ensure it doesn't exceed a certain width */
+  position: relative;
+  border-radius: 8px;
+}
+
+.close {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    font-size: 28px;
+    cursor: pointer;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+label {
+    margin: 10px 0 5px;
+}
+
+input, select {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.ad{
+    padding: 10px;
+    border: none;
+    background-color: #333;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #fff8f8;
+    color: black;
+}
+.budget-input {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-bottom: 10px;
+}
+.button-container {
+  display: flex;              /* Use flexbox to align buttons */
+  justify-content: flex-start; /* Align buttons to the start */
+  gap: 10px;                 /* Optional: space between buttons */
+}
+th:last-child{
+  text-align: center;
+}
+.budget-input select, .budget-input input {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.budget-input input {
+    width: 100%;
+}
+
+
+.do{
+    display: flex;
+}
+.noselect{
+    border-radius: 60px;
+}
+/* CSS for Edit and Save buttons */
+button.editBtn, button.deleteBtn {
+    background-color: #ffffff; /* Green */
+    border: none;
+    color: rgb(0, 0, 0);
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 12px;
+    transition: background-color 0.3s ease;
+}
+
+button.saveTaskBtn {
+    background-color: #000000; /* Blue */
+    border: none;
+    color: rgb(255, 255, 255);
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 12px;
+    transition: background-color 0.3s ease;
+}
+
+
+
+button.editBtn:hover, button.deleteBtn:hover, button.saveTaskBtn:hover {
+    background-color: #3a3a3a;
+    color: white;
+}
+
+/* Optional: for a more distinct hover effect on save button */
+button.saveTaskBtn:hover {
+    background-color: #005f6b; /* Darker Blue */
+}
+/* Style for the table container to prevent width changes */
+.table-container {
+    width: 100%; /* Adjust this to the desired width */
+    overflow-x: auto;
+}
+
+/* Table styling */
+table {
+    width: 100%;
+    border-collapse: collapse;
+   
+}
+
+/* Column styling */
+table th, table td {
+    padding: 8px;
+   
+    text-align: left;
+}
+
+
+table th:nth-child(1), table td:nth-child(1) { width: 20%; } 
+table th:nth-child(2), table td:nth-child(2) { width: 20%; } 
+table th:nth-child(3), table td:nth-child(3) { width: 10%; } 
+table th:nth-child(4), table td:nth-child(4) { width: 15%; } 
+table th:nth-child(5), table td:nth-child(5) { width: 15%; } 
+table th:nth-child(6), table td:nth-child(6) { width: 10%; } 
+table th:nth-child(7), table td:nth-child(7) { width: 10%; }
+
+#saveTaskBtn{
+    background-color: #606060;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    padding-left: 20px;
+
+}
+#saveTaskBtn:hover{
+    background-color: #000000;
+    color: white;
+    
+    
+}
+.team-tag{
+display: flex;
+align-items: center;
+background-color: #e0e0e0;
+border-radius: 50px;
+padding: 0px 15px;
+width: fit-content;
+box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+position: absolute;
+top: 0;
+right: 0;
 }
 
 
 
 button:hover {
-  background: red;
+    background-color: #888;
 }
 
-button:active {
-  background: white;
+.details {
+    margin-right: 10px;
 }
 
-button:hover .text {
-  color: transparent;
+h4 {
+    margin: 0;
+    font-size: 16px;
+    color: #333;
 }
 
-button:hover .icon {
-  width: 150px;
-  border-left: none;
-  transform: translateX(0);
+p {
+    margin: 0;
+    font-size: 12px;
+    color: #666;
 }
 
-button:focus {
-  outline: none;
+.avatar img {
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    border: 3px solid red; /* Outer circle */
 }
 
-button:active .icon svg {
-  transform: scale(0.8);
-}
-
-.buttonSpan {
-  color: white;
-  margin: 150px;
-  font-size: 30px;
-}
-
-
-
-.menu {
-  list-style-type: none;
-  padding: 0;
-  margin: 0;
-}
-
-.menu li {
-  display: flex;
-  align-items: center;
-  padding: 10px 0;
-  cursor: pointer;
-}
-
-.menu li:hover {
-  background-color: #f0f0f0;
-}
-.menu li:active{
-color: #b30021;
-}
-
-
-.menu-icon {
-  width: 24px;
-  height: 24px;
-  margin-right: 10px;
-}
-
-.menu span {
-  font-size: 16px;
-  color: #333;
-}
-
-.sidebar {
-  width: 250px;
-  background-color: #fff;
-  padding: 20px;
-  height: 100vh;
-  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-}
-
-.noselect, .login-signup-btn {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 10px;
-  margin-bottom: 20px;
-  background-color: #000000;
-  color: #fff;
-  border: none;
-  cursor: pointer;
-  font-weight: bold;}
-
-.noselect:hover, .login-signup-btn:hover {
-  background-color: #b30021;
-}
-
-.bottom-image{
-position: absolute;
-bottom: 15px;
-
-}
-
-.sidebar a {
-text-decoration: none; 
-font-family: 'Arial', sans-serif; 
-color: #333; 
-}
-
-.sidebar a:hover {
-color: #ff0022; 
-text-decoration: none; 
+.avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5px;
+    border-radius: 50%;
 }

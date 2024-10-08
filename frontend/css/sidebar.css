@@ -1,0 +1,378 @@
+body{
+    margin:0px;
+    padding:0px;
+  
+  }
+  .sidebar {
+      width: 189px;
+      background-color: rgba(247, 247, 247, 1);
+      color: #000000;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      box-sizing: border-box;
+  }
+  
+  .logo img {
+      width: 232px;
+      height: 302px;
+      margin-bottom: -119px;
+      margin-top: -84px;
+      margin-left: -39px;
+  }
+  .new-project-btn, .login-signup-btn {
+      background-color: #000000;
+      color: white;
+      border: none;
+      padding: 10px;
+      margin: 10px 0;
+      cursor: pointer;
+      border-radius: 41px;
+  }
+  
+  .menu {
+      list-style-type: none;
+      padding: 0;
+  }
+  
+  .menu li {
+      margin: 15px 0;
+      cursor: pointer;
+  }
+  button {
+      width: 150px;
+      height: 50px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      background: black;
+      border: none;
+      border-radius: 40px;
+      box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.15);
+      background: black;
+  
+    }
+    
+    button,
+    button span {
+      transition: 200ms;
+    }
+    
+    button .text {
+      transform: translateX(35px);
+      
+      transform: translateX(35px);
+      color: white;
+      text-align: inherit;
+      font-weight: bold;
+      padding-right: 75px;
+    }
+    
+    button .icon {
+      position: absolute;
+      border-left: 1px solid #ffffff00;
+      transform: translateX(110px);
+      height: 40px;
+      width: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    
+    
+    button:hover {
+      background: red;
+    }
+    
+    button:active {
+      background: white;
+    }
+    
+    button:hover .text {
+      color: transparent;
+    }
+    
+    button:hover .icon {
+      width: 150px;
+      border-left: none;
+      transform: translateX(0);
+    }
+    
+    button:focus {
+      outline: none;
+    }
+    
+    button:active .icon svg {
+      transform: scale(0.8);
+    }
+    
+    .buttonSpan {
+      color: white;
+      margin: 150px;
+      font-size: 30px;
+    }
+    
+  
+  
+    .menu {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+  }
+  
+  .menu li {
+      display: flex;
+      align-items: center;
+      padding: 10px 0;
+      cursor: pointer;
+  }
+  
+  .menu li:hover {
+      background-color: #f0f0f0;
+  }
+  .menu li:active{
+    color: #b30021;
+  }
+  
+  
+  .menu-icon {
+      width: 24px;
+      height: 24px;
+      margin-right: 10px;
+  }
+  
+  .menu span {
+      font-size: 16px;
+      color: #333;
+  }
+  
+  
+  .sidebar {
+      width: 250px;
+      background-color: #fff;
+      padding: 20px;
+      height: 100vh;
+      box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  }
+  
+  .noselect, .login-signup-btn {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 10px;
+      margin-bottom: 20px;
+      background-color: #000000;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;}
+  
+  .noselect:hover, .login-signup-btn:hover {
+      background-color: #b30021;
+  }
+  
+  .bottom-image{
+    position: absolute;
+    bottom: 15px;
+    
+  }
+  
+  .sidebar a {
+    text-decoration: none; 
+    font-family: 'Arial', sans-serif; 
+    color: #333; 
+  }
+  
+  .sidebar a:hover {
+    color: #ff0022; 
+    text-decoration: none; 
+  }
+
+
+  .popup-content h2{
+        
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+
+/* .sidebar {
+    width: 250px;
+    background-color: rgba(247, 247, 247, 1);
+    color: #000000;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    box-sizing: border-box;
+} */
+
+.logo img {
+    width: 232px;
+    height: 302px;
+    margin-bottom: -119px;
+    margin-top: -84px;
+    margin-left: -39px;
+}
+
+
+
+button {
+    width: 150px;
+    height: 50px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    background: black;
+    border: none;
+    border-radius: 40px;
+    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.15);
+    background: black;
+
+  }
+  
+  button,
+  button span {
+    transition: 200ms;
+  }
+  
+  button .text {
+    transform: translateX(35px);
+    
+    transform: translateX(35px);
+    color: white;
+    text-align: inherit;
+    font-weight: bold;
+    padding-right: 75px;
+  }
+  
+  button .icon {
+    position: absolute;
+    border-left: 1px solid #ffffff00;
+    transform: translateX(110px);
+    height: 40px;
+    width: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  
+  
+  button:hover {
+    background: red;
+  }
+  
+  button:active {
+    background: white;
+  }
+  
+  button:hover .text {
+    color: transparent;
+  }
+  
+  button:hover .icon {
+    width: 150px;
+    border-left: none;
+    transform: translateX(0);
+  }
+  
+  button:focus {
+    outline: none;
+  }
+  
+  button:active .icon svg {
+    transform: scale(0.8);
+  }
+  
+  .buttonSpan {
+    color: white;
+    margin: 150px;
+    font-size: 30px;
+  }
+  
+
+
+
+.noselect{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    margin-bottom: 20px;
+    background-color: #000000;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;}
+
+
+
+
+
+.popup {
+  display: none; 
+  position: fixed; 
+  z-index: 1; 
+  left: 0;
+  top: 0;
+  width: 100%; 
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4); 
+  backdrop-filter: blur(5px);
+}
+
+.popup-content {
+  background-color: white;
+  margin: 15% auto; 
+  padding: 20px;
+  border: 1px solid #888;
+  width: 30%; 
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  cursor: pointer;
+}
+.noselect{
+  background-color: #000000;
+}
+h2 {
+    margin-bottom: 20px;
+    font-size: 22px;
+    color: #333;
+}
+
+#newProjectName{
+    width: 90%;
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+}
+.addb {
+    background-color: #4f504f;
+    color: white;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 10px;
+}
+
+.addb:hover {
+    background-color: black;
+}
