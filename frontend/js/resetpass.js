@@ -44,7 +44,7 @@ document
         document.getElementById("message").innerText =
           "Password reset successful!";
         setTimeout(() => {
-          window.location.href = "../html/login.html";
+          window.location.href = "/html/login.html";
         }, 2000);
       }
     } catch (error) {

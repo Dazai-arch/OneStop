@@ -291,65 +291,7 @@ button {
 }
 
 
-.popup {
-  display: none; /* Hidden by default */
-  position: fixed; 
-  z-index: 1; 
-  left: 0;
-  top: 0;
-  width: 100%; 
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(5px);
-}
 
-.popup-content {
-  background-color: white;
-  margin: 15% auto; 
-  padding: 20px;
-  border: 1px solid #888;
-  width: 30%;
-  text-align: center;
-}
-
-.close {
-  color: #aaa;
-  float: right;
-  font-size: 28px;
-  font-weight: bold;
-}
-
-.close:hover,
-.close:focus {
-  color: black;
-  cursor: pointer;
-}
-.noselect{
-  background-color: #000000;
-}
-
-input[type="text"] {
-  width: 90%;
-  padding: 10px;
-  margin-bottom: 20px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  font-size: 16px;
-}
-.addb {
-  background-color: #4f504f;
-  color: white;
-  padding: 10px 20px;
-  font-size: 16px;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-  margin-top: 10px;
-}
-
-.addb:hover {
-  background-color: #fdfffe;
-}
 
 
 .header {
@@ -640,3 +582,67 @@ p {
     padding: 5px;
     border-radius: 50%;
 }
+
+
+.popup {
+  display: none; /* Hidden by default */
+  position: fixed; 
+  z-index: 1; 
+  left: 0;
+  top: 0;
+  width: 100%; 
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(5px);
+  }
+  
+  .popup-content {
+  background-color: white;
+  margin: 15% auto; 
+  padding: 20px;
+  border: 1px solid #888;
+  width: 30%;
+  text-align: center;
+  }
+  
+  #close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  position: relative;
+  }
+  
+  #close:hover,
+  #close:focus {
+  color: black;
+  cursor: pointer;
+  }
+  .noselect{
+  background-color: #000000;
+  }
+  .table{
+  background-color: #d9d9d9;
+  }
+  input[type="text"] {
+  width: 90%;
+  padding: 10px;
+  margin-bottom: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+  }
+  .addb {
+  background-color: #4f504f;
+  color: white;
+  padding: 10px 20px;
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-top: 10px;
+  }
+  
+  .addb:hover {
+  background-color: #fdfffe;
+  }

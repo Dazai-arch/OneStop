@@ -9,30 +9,26 @@ const bcrypt = require("bcryptjs");
 const nodemailer = require("nodemailer");
 const session = require("express-session");
 const MongoStore = require("connect-mongo");
-const multer = require('multer');
+const multer = require("multer");
 
-const socketIO = require('socket.io');
-const http = require('http');
+const socketIO = require("socket.io");
+const http = require("http");
 const cookieParser = require("cookie-parser");
-const sharedSession = require('express-socket.io-session');
+const sharedSession = require("express-socket.io-session");
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-      cb(null, 'uploads'); // Set destination for uploads
+    cb(null, "uploads"); // Set destination for uploads
   },
   filename: (req, file, cb) => {
-      // Use original filename and append a timestamp to avoid name conflicts
-      const ext = path.extname(file.originalname); // Get the original file extension
-      const fileName = `${Date.now()}${ext}`; // Append timestamp to avoid conflicts
-      cb(null, fileName);
-  }
+    // Use original filename and append a timestamp to avoid name conflicts
+    const ext = path.extname(file.originalname); // Get the original file extension
+    const fileName = `${Date.now()}${ext}`; // Append timestamp to avoid conflicts
+    cb(null, fileName);
+  },
 });
 
 const upload = multer({ storage: storage });
-
-
-
-
 
 dotenv.config();
 const app = express();
@@ -40,16 +36,7 @@ const port = 3000;
 const server = http.createServer(app);
 const io = socketIO(server);
 
-
-
-app.use(cors());
-app.use(bodyParser.json());
-app.use(express.static(path.join(__dirname, "./frontend")));
-app.use(express.static(path.join(__dirname, "./Profileimage")));
-app.use(express.static(path.join(__dirname, "./assets")));
-app.use('./uploads', express.static(path.join(__dirname, 'uploads')));
-
-app.use(cookieParser())
+app.use(cookieParser());
 
 const sessionStore = MongoStore.create({
   mongoUrl: process.env.MONGO_URI,
@@ -61,15 +48,61 @@ const sessionMiddleware = session({
   resave: false,
   saveUninitialized: true,
   store: sessionStore,
-  cookie: { secure: false, maxAge: 5 * 60 * 1000 },
+  cookie: { secure: false, maxAge: 7 * 24 * 60 * 60 * 1000 },
 });
 
 app.use(sessionMiddleware);
 
 // Attach the session middleware to Socket.IO
-io.use(sharedSession(sessionMiddleware, {
-  autoSave: true, // Automatically save session changes
-}));
+io.use(
+  sharedSession(sessionMiddleware, {
+    autoSave: true, // Automatically save session changes
+  })
+);
+
+// Authentication middleware
+function isAuthenticated(req, res, next) {
+  if (req.session && req.session.userId) {
+    return next(); // User is authenticated, proceed
+  } else {
+    return res.redirect("/html/login.html"); // Redirect to login page if not logged in
+  }
+}
+
+// Only protect HTML files
+app.use((req, res, next) => {
+  const publicPaths = ["/html/login.html",
+    "/html/home.html",
+    "/html/forgot.html",
+    "/html/signup.html",
+    "/html/verify.html",
+    "/html/reset-password.html",
+    "/login",
+];
+
+  // Check if the path is a public one (e.g., login page)
+  if (publicPaths.some((path) => req.path.startsWith(path))) {
+    return next(); // Allow access to public paths
+  }
+
+  // If the request is for an HTML page, check authentication
+  if (req.path.endsWith(".html")) {
+    return isAuthenticated(req, res, next);
+  }
+
+  // Allow access to all other file types like .css, .js, etc.
+  return next();
+});
+
+app.use(cors());
+app.use(bodyParser.json());
+app.use(express.static(path.join(__dirname, "./frontend")));
+app.use(express.static(path.join(__dirname, "./Profileimage")));
+app.use(express.static(path.join(__dirname, "./assets")));
+app.use("./uploads", express.static(path.join(__dirname, "uploads")));
+app.get('/updated_project_ideas_with_genre.csv', (req, res) => {
+  res.sendFile(path.join(__dirname, 'updated_project_ideas_with_genre.csv'));  // Send the CSV file
+})
 
 // Set up session middleware
 // app.use(
@@ -122,8 +155,6 @@ mongoose
     console.error("Error connecting to MongoDB:", err);
   });
 
-
-
 // Socket.IO connection
 io.on("connection", (socket) => {
   console.log("A user connected");
@@ -135,71 +166,66 @@ io.on("connection", (socket) => {
 
   // If there's no userId, the user is not authenticated
   if (!userId) {
-      console.log("User not authenticated via WebSocket");
-      socket.disconnect(true); // Disconnect the user if not authenticated
-      return;
+    console.log("User not authenticated via WebSocket");
+    socket.disconnect(true); // Disconnect the user if not authenticated
+    return;
   }
 
   // Join a project room
-  socket.on('joinRoom', (roomId) => {
-      if (typeof roomId !== 'string') {
-          console.error(`Invalid roomId: ${roomId}`);
-          return;
-      }
-      
-      const room = io.sockets.adapter.rooms.get(roomId) || new Set();
+  socket.on("joinRoom", (roomId) => {
+    if (typeof roomId !== "string") {
+      console.error(`Invalid roomId: ${roomId}`);
+      return;
+    }
 
-      if (room.size >= 7) {
-          socket.emit('roomFull', 'This project already has 7 collaborators.');
-          return;
-      }
+    const room = io.sockets.adapter.rooms.get(roomId) || new Set();
 
-      socket.join(roomId);
-      console.log(`User ${userId} joined room ${roomId}`);
+    if (room.size >= 7) {
+      socket.emit("roomFull", "This project already has 7 collaborators.");
+      return;
+    }
+
+    socket.join(roomId);
+    console.log(`User ${userId} joined room ${roomId}`);
   });
 
   // Handle sending messages
   socket.on("sendMessage", async (data) => {
-      const { roomId, messageText, filePath, fileName } = data;
+    const { roomId, messageText, filePath, fileName } = data;
 
-      if (!roomId) {
-          console.error("No roomId provided when sending message");
-          return;
-      }
+    if (!roomId) {
+      console.error("No roomId provided when sending message");
+      return;
+    }
 
-      // Create and save the message
-      const message = new Message({
-          projectId: roomId, // Ensure projectId is passed
-          sender: userId,
-          senderName: username,
-          text: messageText,
-          filePath: filePath || null,
-          fileName: fileName || null, // Include filePath if it exists
-      });
+    // Create and save the message
+    const message = new Message({
+      projectId: roomId, // Ensure projectId is passed
+      sender: userId,
+      senderName: username,
+      text: messageText,
+      filePath: filePath || null,
+      fileName: fileName || null, // Include filePath if it exists
+    });
 
-      try {
-          await message.save(); // Save the message to the database
-          socket.to(roomId).emit("receiveMessage", { messageText, filePath, fileName, userId, username}); // Broadcast message to the room
-      } catch (error) {
-          console.error("Error saving message:", error);
-      }
+    try {
+      await message.save(); // Save the message to the database
+      socket.to(roomId).emit("receiveMessage", {
+        messageText,
+        filePath,
+        fileName,
+        userId,
+        username,
+      }); // Broadcast message to the room
+    } catch (error) {
+      console.error("Error saving message:", error);
+    }
   });
-  
 
   socket.on("disconnect", () => {
-      console.log("A user disconnected");
+    console.log("A user disconnected");
   });
 });
-
-function isAuthenticated(req, res, next) {
-  if (req.session && req.session.userId) {
-    return next(); // User is authenticated, proceed to the next middleware or route handler
-  }else {
-    return res.redirect('/html/login.html'); // Redirect to login page if not logged in
-  }
-  // return res.status(401).json({ message: "Unauthorized access. Please log in." }); // Not logged in, return an error or redirect
-}
-
 
 const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
@@ -252,7 +278,7 @@ app.post("/signup", async (req, res) => {
 
       // Add the new user as a collaborator to the project
       await Project.findByIdAndUpdate(projectId, {
-          $addToSet: { collaborators: savedUser._id },
+        $addToSet: { collaborators: savedUser._id },
       });
       console.log(`User ${email} added to project ID: ${projectId}`);
 
@@ -296,7 +322,6 @@ app.post("/save-profile-image", async (req, res) => {
   }
 });
 
-
 app.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
@@ -332,8 +357,6 @@ app.post("/login", async (req, res) => {
     res.status(500).json({ message: "Login failed due to an error." });
   }
 });
-
-
 
 let resetCodes = {};
 
@@ -417,8 +440,7 @@ app.post("/reset-password", async (req, res) => {
   }
 });
 
-
-app.get("/profile",async (req, res) => {
+app.get("/profile", async (req, res) => {
   // Get user ID from session
   const userId = req.session.userId;
 
@@ -448,7 +470,6 @@ app.get("/profile",async (req, res) => {
   }
 });
 
-
 // Generate a verification code and send it to the user's email
 app.post("/send-verification-code", async (req, res) => {
   const userId = req.session.userId;
@@ -458,8 +479,10 @@ app.post("/send-verification-code", async (req, res) => {
   }
 
   const user = await User.findById(userId);
-  const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
-  
+  const verificationCode = Math.floor(
+    100000 + Math.random() * 900000
+  ).toString();
+
   // Store the verification code in the session for later verification
   req.session.verificationCode = verificationCode;
 
@@ -481,7 +504,9 @@ app.post("/send-verification-code", async (req, res) => {
   transporter.sendMail(mailOptions, (err, info) => {
     if (err) {
       console.error("Error sending mail:", err);
-      return res.status(500).json({ message: "Error sending verification code" });
+      return res
+        .status(500)
+        .json({ message: "Error sending verification code" });
     }
     console.log("Verification email sent:", info.response);
     res.json({ message: "Verification code sent to your email!" });
@@ -495,22 +520,24 @@ app.post("/verify-code", async (req, res) => {
 
   // Check if the verification code matches
   if (req.session.verificationCode === code) {
-      // Clear the verification code after successful verification
-      delete req.session.verificationCode;
+    // Clear the verification code after successful verification
+    delete req.session.verificationCode;
 
-      // Set a flag indicating that the user has been verified
-      req.session.isVerified = true;
+    // Set a flag indicating that the user has been verified
+    req.session.isVerified = true;
 
-      return res.json({ success: true });
+    return res.json({ success: true });
   }
 
   // If the code is invalid and the user is not verified
   if (userId && !req.session.isVerified) {
-      // Delete the user's data from the database
-      await User.findByIdAndDelete(userId);
+    // Delete the user's data from the database
+    await User.findByIdAndDelete(userId);
   }
 
-  res.status(400).json({ success: false, message: "Invalid verification code" });
+  res
+    .status(400)
+    .json({ success: false, message: "Invalid verification code" });
 });
 
 // Delete user data if the window is closed
@@ -533,35 +560,32 @@ app.delete("/delete-user-data", async (req, res) => {
   }
 });
 
-
-
 app.post("/logout", (req, res) => {
   // Destroy the session and clear the session cookie
   req.session.destroy((err) => {
-      if (err) {
-          console.error("Error logging out:", err);
-          return res.status(500).json({ message: "Failed to log out." });
-      }
+    if (err) {
+      console.error("Error logging out:", err);
+      return res.status(500).json({ message: "Failed to log out." });
+    }
 
-      // Clear session cookie to ensure the session is fully terminated
-      res.clearCookie('connect.sid', {
-          path: '/',
-          httpOnly: true,
-          secure: false, // Set true if using HTTPS
-      });
+    // Clear session cookie to ensure the session is fully terminated
+    res.clearCookie("connect.sid", {
+      path: "/",
+      httpOnly: true,
+      secure: false, // Set true if using HTTPS
+    });
 
-      // Redirect to the home page
-      res.status(200).json({ message: "Logged out successfully." });
+    // Redirect to the home page
+    res.status(200).json({ message: "Logged out successfully." });
   });
 });
-
 
 // projects routers
 // Project Schema
 const projectSchema = new mongoose.Schema({
   name: { type: String, required: true },
-  owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-  collaborators: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+  owner: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  collaborators: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
   selectedResources: [{ type: String }],
   createdAt: { type: Date, default: Date.now },
 });
@@ -570,7 +594,6 @@ const projectSchema = new mongoose.Schema({
 projectSchema.index({ name: 1, owner: 1 }, { unique: true });
 
 const Project = mongoose.model("Project", projectSchema);
-
 
 // Create Project Endpoint
 app.post("/api/projects", async (req, res) => {
@@ -584,7 +607,9 @@ app.post("/api/projects", async (req, res) => {
   //console.log("User ID from session:", userId);
 
   if (!userId) {
-    return res.status(400).json({ message: "User not authenticated. Please log in again." });
+    return res
+      .status(400)
+      .json({ message: "User not authenticated. Please log in again." });
   }
 
   if (!name || name.trim() === "") {
@@ -599,21 +624,29 @@ app.post("/api/projects", async (req, res) => {
     });
 
     await newProject.save();
-    res.status(201).json({ message: "Project created successfully!", project: newProject });
+    res
+      .status(201)
+      .json({ message: "Project created successfully!", project: newProject });
   } catch (error) {
     if (error.code === 11000) {
-      return res.status(400).json({ message: `A project named "${name}" already exists for this user.` });
+      return res.status(400).json({
+        message: `A project named "${name}" already exists for this user.`,
+      });
     }
     console.error("Error creating project:", error);
-    res.status(500).json({ message: "An error occurred while creating the project." });
+    res
+      .status(500)
+      .json({ message: "An error occurred while creating the project." });
   }
 });
 
-app.post('/api/select-project', (req, res) => {
+app.post("/api/select-project", (req, res) => {
   const { projectId } = req.body;
 
   if (!projectId) {
-      return res.status(400).json({ success: false, message: 'Project ID is required' });
+    return res
+      .status(400)
+      .json({ success: false, message: "Project ID is required" });
   }
 
   // Store the project ID in the session
@@ -623,15 +656,14 @@ app.post('/api/select-project', (req, res) => {
   res.json({ success: true });
 });
 
-app.get('/api/get-selected-project', (req, res) => {
+app.get("/api/get-selected-project", (req, res) => {
   const projectId = req.session.projectId;
   if (projectId) {
-      res.json({ success: true, projectId });
+    res.json({ success: true, projectId });
   } else {
-      res.json({ success: false });
+    res.json({ success: false });
   }
 });
-
 
 // Delete Project Endpoint
 // Delete Project Endpoint
@@ -649,7 +681,9 @@ app.delete("/api/projects/:id", async (req, res) => {
 
     // Check if the user owns the project
     if (!project.owner.equals(userId)) {
-      return res.status(403).json({ message: "You are not authorized to delete this project." });
+      return res
+        .status(403)
+        .json({ message: "You are not authorized to delete this project." });
     }
 
     // Delete the project
@@ -657,109 +691,126 @@ app.delete("/api/projects/:id", async (req, res) => {
     res.status(200).json({ message: "Project deleted successfully!" });
   } catch (error) {
     console.error("Error deleting project:", error);
-    res.status(500).json({ message: "An error occurred while deleting the project." });
+    res
+      .status(500)
+      .json({ message: "An error occurred while deleting the project." });
   }
 });
 
-app.get('/api/project', async (req, res) => {
+app.get("/api/project", async (req, res) => {
   const userId = req.session.userId;
 
   if (!userId) {
-      console.warn('Unauthorized access attempt.');
-      return res.status(403).json({ message: 'User not authenticated' });
+    console.warn("Unauthorized access attempt.");
+    return res.status(403).json({ message: "User not authenticated" });
   }
 
   try {
-      // Fetch projects where the user is the owner or a collaborator
-      const projects = await Project.find({ 
-          $or: [{ owner: userId }, { collaborators: userId }] 
-      }).populate('collaborators', 'username').lean();
-      //console.log('Serialized projects fetched from DB:', projects)
+    // Fetch projects where the user is the owner or a collaborator
+    const projects = await Project.find({
+      $or: [{ owner: userId }, { collaborators: userId }],
+    })
+      .populate("collaborators", "username")
+      .lean();
+    //console.log('Serialized projects fetched from DB:', projects)
 
-        // console.log('Serialized projects fetched from DB:', serializedProjects); 
-      // Respond with the fetched projects
-      res.status(200).json(projects); 
+    // console.log('Serialized projects fetched from DB:', serializedProjects);
+    // Respond with the fetched projects
+    res.status(200).json(projects);
   } catch (error) {
-      console.error("Error fetching projects:", error);
-      // Return error message with a status code of 500
-      res.status(500).json({ message: "An error occurred while fetching projects." });
+    console.error("Error fetching projects:", error);
+    // Return error message with a status code of 500
+    res
+      .status(500)
+      .json({ message: "An error occurred while fetching projects." });
   }
 });
-
 
 // Task Schema
 const taskSchema = new mongoose.Schema({
   title: { type: String, required: true },
   description: { type: String },
-  status: { type: String, enum: ['New', 'Planned', 'In Progress', 'Completed'], default: 'New' },
-  owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-  projectId: { type: mongoose.Schema.Types.ObjectId, ref: 'Project', required: true },
-  assignee:{ type: String, required: true },
-  dueDate: { type: Date }, 
+  status: {
+    type: String,
+    enum: ["New", "Planned", "In Progress", "Completed"],
+    default: "New",
+  },
+  owner: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  projectId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Project",
+    required: true,
+  },
+  assignee: { type: String, required: true },
+  dueDate: { type: Date },
   impact: { type: String },
   budget: { type: String },
-  currency: { type: String, default: 'USD' },
+  currency: { type: String, default: "USD" },
   members: [{ name: String }],
-  collaborators: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+  collaborators: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
   createdAt: { type: Date, default: Date.now },
 });
-
 
 const Task = mongoose.model("Task", taskSchema);
 
 // Create Task Endpoint
 app.post("/api/tasks", async (req, res) => {
-  const { title, description, status, assignee , dueDate, impact, budget} = req.body;
+  const { title, description, status, assignee, dueDate, impact, budget } =
+    req.body;
   const userId = req.session.userId;
   const projectId = req.session.projectId;
   if (!projectId) {
-     return res.status(400).json({ message: "No project selected." });
+    return res.status(400).json({ message: "No project selected." });
   }
 
   try {
-     const newTask = new Task({
-        title,
-        description,
-        status,
-        assignee, // Save assignee
-        owner: userId,
-        projectId: projectId,
-        members: [],
-        dueDate, // Store dueDate
-        impact, // Store impact
-        budget, // Initialize members
-     });
+    const newTask = new Task({
+      title,
+      description,
+      status,
+      assignee, // Save assignee
+      owner: userId,
+      projectId: projectId,
+      members: [],
+      dueDate, // Store dueDate
+      impact, // Store impact
+      budget, // Initialize members
+    });
 
-     const savedTask = await newTask.save();
-     res.status(201).json({ message: "Task created successfully!", task: savedTask });
+    const savedTask = await newTask.save();
+    res
+      .status(201)
+      .json({ message: "Task created successfully!", task: savedTask });
   } catch (error) {
-     console.error("Error creating task:", error);
-     res.status(500).json({ message: "An error occurred while creating the task." });
+    console.error("Error creating task:", error);
+    res
+      .status(500)
+      .json({ message: "An error occurred while creating the task." });
   }
 });
-
-
 
 // Fetch Tasks Endpoint
 app.get("/api/tasks", async (req, res) => {
   const userId = req.session.userId;
-  const projectId = req.session.projectId;  // Get projectId from session
+  const projectId = req.session.projectId; // Get projectId from session
 
   if (!projectId) {
-      return res.status(400).json({ message: "No project selected." });
+    return res.status(400).json({ message: "No project selected." });
   }
 
   try {
-      // Fetch tasks for the project owner and collaborators
-      const tasks = await Task.find({ projectId: projectId })  // Fetch all tasks for the project
-          .populate('assignee', 'username image') // Populate assignee's username and image
-          .populate('owner', 'username image') // Populate owner's username and image if needed
-          .populate('collaborators', 'username image');
+    // Fetch tasks for the project owner and collaborators
+    const tasks = await Task.find({ projectId: projectId }) // Fetch all tasks for the project
+      .populate("assignee", "username image") // Populate assignee's username and image
+      .populate("owner", "username image") // Populate owner's username and image if needed
+      .populate("collaborators", "username image");
 
-      res.status(200).json(tasks);
+    res.status(200).json(tasks);
   } catch (error) {
-      console.error("Error fetching tasks:", error);
-      res.status(500).json({ message: "An error occurred while fetching tasks." });
+    console.error("Error fetching tasks:", error);
+    res
+      .status(500)
+      .json({ message: "An error occurred while fetching tasks." });
   }
 });
 
@@ -770,20 +821,24 @@ app.put("/api/tasks/:id", async (req, res) => {
   const { members, status, assignee } = req.body; // Capture updated assignee
 
   try {
-     const updatedTask = await Task.findOneAndUpdate(
-        { _id: taskId, projectId: req.session.projectId },
-        req.body, // Use req.body directly to update all fields
-        { new: true }
-     );
+    const updatedTask = await Task.findOneAndUpdate(
+      { _id: taskId, projectId: req.session.projectId },
+      req.body, // Use req.body directly to update all fields
+      { new: true }
+    );
 
-     if (!updatedTask) {
-        return res.status(404).json({ message: "Task not found." });
-     }
-     io.to(updatedTask.projectId).emit('taskUpdated', updatedTask);
-     res.status(200).json({ message: "Task updated successfully!", task: updatedTask });
+    if (!updatedTask) {
+      return res.status(404).json({ message: "Task not found." });
+    }
+    io.to(updatedTask.projectId).emit("taskUpdated", updatedTask);
+    res
+      .status(200)
+      .json({ message: "Task updated successfully!", task: updatedTask });
   } catch (error) {
-     console.error("Error updating task:", error);
-     res.status(500).json({ message: "An error occurred while updating the task." });
+    console.error("Error updating task:", error);
+    res
+      .status(500)
+      .json({ message: "An error occurred while updating the task." });
   }
 });
 
@@ -793,7 +848,10 @@ app.delete("/api/tasks/:id", async (req, res) => {
   const userId = req.session.userId;
 
   try {
-    const task = await Task.findOneAndDelete({ _id: taskId, projectId: req.session.projectId });
+    const task = await Task.findOneAndDelete({
+      _id: taskId,
+      projectId: req.session.projectId,
+    });
 
     if (!task) {
       return res.status(404).json({ message: "Task not found." });
@@ -802,7 +860,9 @@ app.delete("/api/tasks/:id", async (req, res) => {
     res.status(200).json({ message: "Task deleted successfully!" });
   } catch (error) {
     console.error("Error deleting task:", error);
-    res.status(500).json({ message: "An error occurred while deleting the task." });
+    res
+      .status(500)
+      .json({ message: "An error occurred while deleting the task." });
   }
 });
 
@@ -813,20 +873,20 @@ app.post("/api/save-resources", async (req, res) => {
   const projectId = req.session.projectId; // Get projectId from the session
 
   if (!userId || !projectId) {
-      return res.status(400).json({ message: "User or project not specified" });
+    return res.status(400).json({ message: "User or project not specified" });
   }
 
   try {
-      // Update the resources for the selected project
-      await Project.findOneAndUpdate(
-          { _id: projectId, $or: [{ owner: userId }, { collaborators: userId }] },
-          { selectedResources: resources },
-          { new: true }
-      );
-      res.status(200).json({ message: "Resources saved successfully!" });
+    // Update the resources for the selected project
+    await Project.findOneAndUpdate(
+      { _id: projectId, $or: [{ owner: userId }, { collaborators: userId }] },
+      { selectedResources: resources },
+      { new: true }
+    );
+    res.status(200).json({ message: "Resources saved successfully!" });
   } catch (error) {
-      console.error("Error saving resources:", error);
-      res.status(500).json({ message: "Failed to save resources" });
+    console.error("Error saving resources:", error);
+    res.status(500).json({ message: "Failed to save resources" });
   }
 });
 app.get("/api/get-resources", async (req, res) => {
@@ -834,188 +894,200 @@ app.get("/api/get-resources", async (req, res) => {
   const projectId = req.session.projectId; // Get projectId from the session
 
   if (!userId || !projectId) {
-      return res.status(400).json({ message: "User or project not specified" });
+    return res.status(400).json({ message: "User or project not specified" });
   }
 
   try {
-      // Find the project by ID and check if the user is either the owner or a collaborator
-      const project = await Project.findOne({
-          _id: projectId,
-          $or: [{ owner: userId }, { collaborators: userId }] // Check for ownership or collaboration
-      });
+    // Find the project by ID and check if the user is either the owner or a collaborator
+    const project = await Project.findOne({
+      _id: projectId,
+      $or: [{ owner: userId }, { collaborators: userId }], // Check for ownership or collaboration
+    });
 
-      if (!project) {
-          return res.status(404).json({ message: "Project not found" });
-      }
+    if (!project) {
+      return res.status(404).json({ message: "Project not found" });
+    }
 
-      res.status(200).json({ selectedResources: project.selectedResources });
+    res.status(200).json({ selectedResources: project.selectedResources });
   } catch (error) {
-      console.error("Error retrieving resources:", error);
-      res.status(500).json({ message: "Failed to retrieve resources" });
+    console.error("Error retrieving resources:", error);
+    res.status(500).json({ message: "Failed to retrieve resources" });
   }
 });
 
-
 //Collaborators Routes
 
-
-
 const messageSchema = new mongoose.Schema({
-  projectId: { type: mongoose.Schema.Types.ObjectId, ref: 'Project', required: true },
-  sender: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // Reference to the user
+  projectId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Project",
+    required: true,
+  },
+  sender: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true }, // Reference to the user
   text: { type: String },
   filePath: { type: String },
   fileName: { type: String }, // Optional: Store file path if the message includes a file
   timestamp: { type: Date, default: Date.now },
 });
 
-const Message = mongoose.model('Message', messageSchema);
+const Message = mongoose.model("Message", messageSchema);
 
-app.post('/invite-collaborator', async (req, res) => {
+app.post("/invite-collaborator", async (req, res) => {
   const { projectId, collaboratorEmail } = req.body;
 
   // Check if collaboratorEmail is provided
   if (!collaboratorEmail) {
-      return res.status(400).json({ message: 'Email is required.' });
+    return res.status(400).json({ message: "Email is required." });
   }
   try {
-      // Check if the collaborator exists in the database
-      const existingUser = await User.findOne({ email: collaboratorEmail });
-      
-      const project = await Project.findById(projectId);
-      if (!project) {
-          return res.status(404).json({ message: 'Project not found.' });
-      }
-      if (existingUser && existingUser._id.equals(project.owner)) {
-        return res.status(400).json({ message: 'Cannot invite the project owner as a collaborator.' });
+    // Check if the collaborator exists in the database
+    const existingUser = await User.findOne({ email: collaboratorEmail });
+
+    const project = await Project.findById(projectId);
+    if (!project) {
+      return res.status(404).json({ message: "Project not found." });
+    }
+    if (existingUser && existingUser._id.equals(project.owner)) {
+      return res.status(400).json({
+        message: "Cannot invite the project owner as a collaborator.",
+      });
     }
 
     // Check if the user is already a collaborator
     if (existingUser && project.collaborators.includes(existingUser._id)) {
-        return res.status(409).json({ message: 'User is already a collaborator on this project.' });
+      return res
+        .status(409)
+        .json({ message: "User is already a collaborator on this project." });
     }
 
-      // Create the email transporter
-      const transporter = nodemailer.createTransport({
-          service: 'Gmail',
-          auth: {
-              user: process.env.EMAIL,
-              pass: process.env.EMAIL_PASSWORD,
-          },
-      });
+    // Create the email transporter
+    const transporter = nodemailer.createTransport({
+      service: "Gmail",
+      auth: {
+        user: process.env.EMAIL,
+        pass: process.env.EMAIL_PASSWORD,
+      },
+    });
 
-      // Construct the acceptance link
-      const host = req.get('host'); 
-      const protocol = req.protocol; 
-      const link = `${protocol}://${host}/accept-invitation/${projectId}/${encodeURIComponent(collaboratorEmail)}`;
+    // Construct the acceptance link
+    const host = req.get("host");
+    const protocol = req.protocol;
+    const link = `${protocol}://${host}/accept-invitation/${projectId}/${encodeURIComponent(
+      collaboratorEmail
+    )}`;
 
-      // Define email options
-      const mailOptions = {
-          from: process.env.EMAIL,
-          to: collaboratorEmail, // Make sure this is correctly set
-          subject: 'Project Invitation',
-          text: `You have been invited to join the project. Click the link to accept: ${link}`,
-      };
+    // Define email options
+    const mailOptions = {
+      from: process.env.EMAIL,
+      to: collaboratorEmail, // Make sure this is correctly set
+      subject: "Project Invitation",
+      text: `You have been invited to join the project. Click the link to accept: ${link}`,
+    };
 
-      // Send the invitation email
-      await transporter.sendMail(mailOptions);
+    // Send the invitation email
+    await transporter.sendMail(mailOptions);
 
-      // Respond with a success message
-      res.status(200).json({ message: 'Invitation sent! User can sign up to accept the invitation.' });
+    // Respond with a success message
+    res.status(200).json({
+      message: "Invitation sent! User can sign up to accept the invitation.",
+    });
   } catch (error) {
-      console.error('Error inviting collaborator:', error); // Log the error details for debugging
-      res.status(500).json({ message: 'Error inviting collaborator. Please try again.' });
+    console.error("Error inviting collaborator:", error); // Log the error details for debugging
+    res
+      .status(500)
+      .json({ message: "Error inviting collaborator. Please try again." });
   }
 });
 
-
-
-app.get('/accept-invitation/:projectId/:email', async (req, res) => {
+app.get("/accept-invitation/:projectId/:email", async (req, res) => {
   const { projectId, email } = req.params; // Get projectId and email from URL parameters
   console.log("Project ID:", projectId); // Log projectId
   console.log("Email:", email); // Log email
 
   // Validate the project ID
   if (!mongoose.isValidObjectId(projectId)) {
-      return res.status(400).json({ message: 'Invalid project ID' });
+    return res.status(400).json({ message: "Invalid project ID" });
   }
 
   try {
-      // Check if the user exists in the database
-      let user = await User.findOne({ email });
+    // Check if the user exists in the database
+    let user = await User.findOne({ email });
 
-      // If the user does not exist, create a new user
-      if (!user) {
-        console.log(`User not found for email: ${email}. Redirecting to signup.`);
-        req.session.invitationDetails = { projectId, email }; // Store in session
-        return res.redirect('/html/signup.html');
-      }
+    // If the user does not exist, create a new user
+    if (!user) {
+      console.log(`User not found for email: ${email}. Redirecting to signup.`);
+      req.session.invitationDetails = { projectId, email }; // Store in session
+      return res.redirect("/html/signup.html");
+    }
 
-      // Fetch the project to check if it exists
-      const project = await Project.findById(projectId);
-      if (!project) {
-          return res.status(404).json({ message: 'Project not found.' });
-      }
+    // Fetch the project to check if it exists
+    const project = await Project.findById(projectId);
+    if (!project) {
+      return res.status(404).json({ message: "Project not found." });
+    }
 
-      // Check if user is already a collaborator
-      if (project.collaborators.includes(user._id)) {
-          return res.status(409).json({ message: 'User is already a collaborator on this project.' });
-      }
+    // Check if user is already a collaborator
+    if (project.collaborators.includes(user._id)) {
+      return res
+        .status(409)
+        .json({ message: "User is already a collaborator on this project." });
+    }
 
-      // Update the project to add the user as a collaborator
-      await Project.findByIdAndUpdate(projectId, { $addToSet: { collaborators: user._id } });
-      
-      await Task.updateMany(
-        { projectId: projectId }, // Find all tasks for this project
-        { $addToSet: { collaborators: user._id } } // Add collaborator to each task
+    // Update the project to add the user as a collaborator
+    await Project.findByIdAndUpdate(projectId, {
+      $addToSet: { collaborators: user._id },
+    });
+
+    await Task.updateMany(
+      { projectId: projectId }, // Find all tasks for this project
+      { $addToSet: { collaborators: user._id } } // Add collaborator to each task
     );
-      // Redirect or respond with success
-      res.redirect('/html/login.html'); // Redirect to a success page or a login page
+    // Redirect or respond with success
+    res.redirect("/html/login.html"); // Redirect to a success page or a login page
   } catch (error) {
-      console.error('Error accepting invitation:', error); // Log any errors for debugging
-      res.status(500).json({ message: 'Error accepting invitation' });
+    console.error("Error accepting invitation:", error); // Log any errors for debugging
+    res.status(500).json({ message: "Error accepting invitation" });
   }
 });
 
-
-app.get('/api/get-invitation-details', (req, res) => {
+app.get("/api/get-invitation-details", (req, res) => {
   if (req.session.invitationDetails) {
-      return res.json({ success: true, invitationDetails: req.session.invitationDetails });
+    return res.json({
+      success: true,
+      invitationDetails: req.session.invitationDetails,
+    });
   }
   return res.json({ success: false });
 });
 
-
-
-
-app.post('/upload-file', upload.single('file'), (req, res) => {
+app.post("/upload-file", upload.single("file"), (req, res) => {
   if (req.file) {
     const originalFileName = req.file.originalname; // Get the original file name
-    const savedFilePath = `./uploads/${originalFileName}`.replace(/\\/g, '/'); // Save the file with the original name
+    const savedFilePath = `./uploads/${originalFileName}`.replace(/\\/g, "/"); // Save the file with the original name
 
     fs.rename(req.file.path, savedFilePath, (err) => {
       if (err) {
-        return res.status(500).json({ message: 'Error saving file' });
+        return res.status(500).json({ message: "Error saving file" });
       }
 
       // Respond with the saved file path and the original file name
       res.status(200).json({
         filePath: savedFilePath,
-        fileName: originalFileName
+        fileName: originalFileName,
       });
     });
   } else {
-    res.status(400).json({ message: 'File upload failed.' });
+    res.status(400).json({ message: "File upload failed." });
   }
 });
 
-app.get('/uploads/:filename', (req, res) => {
-  const filePath = path.join(__dirname, 'uploads', req.params.filename);
+app.get("/uploads/:filename", (req, res) => {
+  const filePath = path.join(__dirname, "uploads", req.params.filename);
   res.download(filePath, (err) => {
-      if (err) {
-          console.error("Error downloading file:", err);
-          res.status(500).send('Could not download the file.');
-      }
+    if (err) {
+      console.error("Error downloading file:", err);
+      res.status(500).send("Could not download the file.");
+    }
   });
 });
 
@@ -1023,84 +1095,90 @@ app.get("/api/messages/:projectId", async (req, res) => {
   const { projectId } = req.params;
 
   try {
-      // Fetch all messages for the project and populate sender information
-      const messages = await Message.find({ projectId })
-          .populate("sender", "username") // Populate the username
-          .sort("timestamp"); // Sort messages by timestamp
+    // Fetch all messages for the project and populate sender information
+    const messages = await Message.find({ projectId })
+      .populate("sender", "username") // Populate the username
+      .sort("timestamp"); // Sort messages by timestamp
 
-      res.status(200).json(messages); // Send the messages back to the client
+    res.status(200).json(messages); // Send the messages back to the client
   } catch (error) {
-      console.error("Error fetching messages:", error);
-      res.status(500).json({ message: "Failed to fetch messages." });
+    console.error("Error fetching messages:", error);
+    res.status(500).json({ message: "Failed to fetch messages." });
   }
 });
 
-app.get('/api/session-info', (req, res) => {
+app.get("/api/session-info", (req, res) => {
   if (!req.session.userId || !req.session.projectId) {
-      return res.status(400).json({ message: 'User ID or Project ID not found in session.' });
+    return res
+      .status(400)
+      .json({ message: "User ID or Project ID not found in session." });
   }
   res.json({
-      userId: req.session.userId,
-      projectId: req.session.projectId,
-      username: req.session.userName
+    userId: req.session.userId,
+    projectId: req.session.projectId,
+    username: req.session.userName,
   });
 });
 
 // Fetch user details by ID
-app.get('/api/users/:id', async (req, res) => {
+app.get("/api/users/:id", async (req, res) => {
   const userId = req.params.id;
 
   try {
-      const user = await User.findById(userId, 'username'); // Fetch only the username
-      if (!user) {
-          return res.status(404).json({ message: 'User not found' });
-      }
-      res.status(200).json(user); // Respond with user data
+    const user = await User.findById(userId, "username"); // Fetch only the username
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.status(200).json(user); // Respond with user data
   } catch (error) {
-      console.error('Error fetching user:', error);
-      res.status(500).json({ message: 'Failed to fetch user.' });
+    console.error("Error fetching user:", error);
+    res.status(500).json({ message: "Failed to fetch user." });
   }
 });
 
-app.get('/api/users', async (req, res) => {
+app.get("/api/users", async (req, res) => {
   try {
-      // Fetch all users from the database
-      const users = await User.find({}, 'username _id'); // Select only username and _id fields
+    // Fetch all users from the database
+    const users = await User.find({}, "username _id"); // Select only username and _id fields
 
-      // Send the user data back as a JSON response
-      res.status(200).json(users);
+    // Send the user data back as a JSON response
+    res.status(200).json(users);
   } catch (error) {
-      console.error("Error fetching users:", error);
-      res.status(500).json({ message: "Failed to fetch users." });
+    console.error("Error fetching users:", error);
+    res.status(500).json({ message: "Failed to fetch users." });
   }
 });
-app.get('/api/projects/collaborators', async (req, res) => {
+app.get("/api/projects/collaborators", async (req, res) => {
   const projectId = req.session.projectId; // Get project ID from the session
 
   if (!projectId) {
-      return res.status(400).json({ message: 'Project ID not found in session.' });
+    return res
+      .status(400)
+      .json({ message: "Project ID not found in session." });
   }
 
   try {
-      // Fetch the project with collaborators
-      const project = await Project.findById(projectId)
-          .populate('collaborators', 'username _id image'); // Populate collaborators with username, id, and image
+    // Fetch the project with collaborators
+    const project = await Project.findById(projectId).populate(
+      "collaborators",
+      "username _id image"
+    ); // Populate collaborators with username, id, and image
 
-      if (!project) {
-          return res.status(404).json({ message: 'Project not found' });
-      }
+    if (!project) {
+      return res.status(404).json({ message: "Project not found" });
+    }
 
-      // Get the owner details
-      const owner = await User.findById(project.owner, 'username _id image'); // Fetch owner details
+    // Get the owner details
+    const owner = await User.findById(project.owner, "username _id image"); // Fetch owner details
 
-      // Return the collaborators along with the owner
-      res.status(200).json({
-          collaborators: project.collaborators,
-          owner: owner // Send the owner details as well
-      });
+    // Return the collaborators along with the owner
+    res.status(200).json({
+      collaborators: project.collaborators,
+      owner: owner, // Send the owner details as well
+    });
   } catch (error) {
-      console.error('Error fetching collaborators:', error);
-      res.status(500).json({ message: 'Failed to fetch collaborators.' });
+    console.error("Error fetching collaborators:", error);
+    res.status(500).json({ message: "Failed to fetch collaborators." });
   }
 });
 
@@ -1111,118 +1189,111 @@ app.use((req, res, next) => {
   const userId = req.session.userId;
 
   if (userId) {
-      if (!userTimeLogs[userId]) {
-          userTimeLogs[userId] = { loginTime: Date.now(), totalTime: 0 };
-      } else {
-          // Update total time only if the session has not been reset
-          userTimeLogs[userId].totalTime += Math.floor((Date.now() - userTimeLogs[userId].loginTime) / 1000); // Accumulate in seconds
-          userTimeLogs[userId].loginTime = Date.now(); // Reset login time
-      }
+    if (!userTimeLogs[userId]) {
+      userTimeLogs[userId] = { loginTime: Date.now(), totalTime: 0 };
+    } else {
+      // Update total time only if the session has not been reset
+      userTimeLogs[userId].totalTime += Math.floor(
+        (Date.now() - userTimeLogs[userId].loginTime) / 1000
+      ); // Accumulate in seconds
+      userTimeLogs[userId].loginTime = Date.now(); // Reset login time
+    }
   }
   next();
 });
 
-
-app.get('/api/time-spent', (req, res) => {
+app.get("/api/time-spent", (req, res) => {
   const userId = req.session.userId;
   if (!userId) {
-    return res.status(401).json({ message: 'Unauthorized' });
+    return res.status(401).json({ message: "Unauthorized" });
   }
 
-  const totalTimeInSeconds = userTimeLogs[userId] ? userTimeLogs[userId].totalTime : 0;
-    const totalTimeInMinutes = totalTimeInSeconds / 60; // Convert seconds to minutes
-    res.json({ totalTime: totalTimeInMinutes });
+  const totalTimeInSeconds = userTimeLogs[userId]
+    ? userTimeLogs[userId].totalTime
+    : 0;
+  const totalTimeInMinutes = totalTimeInSeconds / 60; // Convert seconds to minutes
+  res.json({ totalTime: totalTimeInMinutes });
 });
 
 //total budget
-app.get('/api/total-budget', async (req, res) => {
+app.get("/api/total-budget", async (req, res) => {
   const userId = req.session.userId;
   const projectId = req.session.projectId;
 
   try {
-      const tasks = await Task.find({ projectId: projectId });
+    const tasks = await Task.find({ projectId: projectId });
 
-      // Log the fetched tasks for debugging
-      // console.log("Fetched Tasks:", JSON.stringify(tasks, null, 2));
+    // Log the fetched tasks for debugging
+    // console.log("Fetched Tasks:", JSON.stringify(tasks, null, 2));
 
-      if (tasks.length === 0) {
-          return res.json({ totalBudgets: {} }); // No tasks, return an empty object
-      }
+    if (tasks.length === 0) {
+      return res.json({ totalBudgets: {} }); // No tasks, return an empty object
+    }
 
-      // Object to store total budgets by currency
-      // Object to store total budgets by currency
-// Object to store total budgets by currency
-const totalBudgetsByCurrency = {};
+    // Object to store total budgets by currency
+    // Object to store total budgets by currency
+    // Object to store total budgets by currency
+    const totalBudgetsByCurrency = {};
 
-// Assuming tasks is an array of task objects
-tasks.forEach(task => {
-    // Clean the budget string by removing non-numeric characters (except for decimal point and minus sign)
-    const budgetString = task.budget || '0'; // Default to '0' if budget is undefined
+    // Assuming tasks is an array of task objects
+    tasks.forEach((task) => {
+      // Clean the budget string by removing non-numeric characters (except for decimal point and minus sign)
+      const budgetString = task.budget || "0"; // Default to '0' if budget is undefined
 
-    // Remove non-numeric characters and convert to a float
-    const budgetValue = budgetString.replace(/[^0-9.-]+/g, ""); // Remove non-numeric characters
-    const budget = parseFloat(budgetValue); // Convert the cleaned string to a number
+      // Remove non-numeric characters and convert to a float
+      const budgetValue = budgetString.replace(/[^0-9.-]+/g, ""); // Remove non-numeric characters
+      const budget = parseFloat(budgetValue); // Convert the cleaned string to a number
 
-    // Extract currency symbol from the original budget string
-    const currencyMatch = budgetString.match(/[^\d\s.-]+/g);
-    const currency = currencyMatch ? currencyMatch[0] : null; // Set to null if no currency found
+      // Extract currency symbol from the original budget string
+      const currencyMatch = budgetString.match(/[^\d\s.-]+/g);
+      const currency = currencyMatch ? currencyMatch[0] : null; // Set to null if no currency found
 
-    // Log the budget and currency for debugging
-    // console.log(`Task: ${task.title}, Budget: ${budgetString}, Currency: ${currency ? currency : '0'}`);
+      // Log the budget and currency for debugging
+      // console.log(`Task: ${task.title}, Budget: ${budgetString}, Currency: ${currency ? currency : '0'}`);
 
-    // Validate the budget
-    if (isNaN(budget)) {
+      // Validate the budget
+      if (isNaN(budget)) {
         console.error(`Invalid budget for task: ${task.title}`); // Log error for invalid budget
         return; // Skip this task if budget is invalid
-    }
+      }
 
-    // Skip if currency is not found
-    if (!currency) {
+      // Skip if currency is not found
+      if (!currency) {
         console.error(`Currency not found for task: ${task.title}. Skipping.`);
         return; // Skip this task if currency is not found
-    }
+      }
 
-    // Initialize the currency in the totalBudgetsByCurrency object if it doesn't exist
-    if (!totalBudgetsByCurrency[currency]) {
+      // Initialize the currency in the totalBudgetsByCurrency object if it doesn't exist
+      if (!totalBudgetsByCurrency[currency]) {
         totalBudgetsByCurrency[currency] = 0;
-    }
+      }
 
-    // Sum the budget for the respective currency
-    totalBudgetsByCurrency[currency] += budget;
-});
+      // Sum the budget for the respective currency
+      totalBudgetsByCurrency[currency] += budget;
+    });
 
-// Now you can log or return the totalBudgetsByCurrency for further processing
-// console.log("Total Budgets by Currency:", totalBudgetsByCurrency);
+    // Now you can log or return the totalBudgetsByCurrency for further processing
+    // console.log("Total Budgets by Currency:", totalBudgetsByCurrency);
 
+    // Now you can log or return the totalBudgetsByCurrency for further processing
 
-// Now you can log or return the totalBudgetsByCurrency for further processing
+    // Log the final total budgets by currency
+    // console.log(`Total Budgets by Currency:`, totalBudgetsByCurrency);
 
-
-
-      // Log the final total budgets by currency
-      // console.log(`Total Budgets by Currency:`, totalBudgetsByCurrency);
-
-      // Respond with the total budgets for each currency
-      res.json({ totalBudgets: totalBudgetsByCurrency });
+    // Respond with the total budgets for each currency
+    res.json({ totalBudgets: totalBudgetsByCurrency });
   } catch (error) {
-      console.error("Error calculating budget:", error);
-      res.status(500).json({ message: "Failed to calculate budget." });
+    console.error("Error calculating budget:", error);
+    res.status(500).json({ message: "Failed to calculate budget." });
   }
 });
 
-
-
-
-
-
-
-
-app.get('/api/user-projects-count', async (req, res) => {
+app.get("/api/user-projects-count", async (req, res) => {
   const userId = req.session.userId;
-  
+
   try {
     const projectCount = await Project.countDocuments({ owner: userId });
-    const projectc = projectCount + 1;
+    const projectc = projectCount;
     res.json({ projectc });
   } catch (error) {
     console.error("Error fetching project count:", error);
@@ -1230,12 +1301,18 @@ app.get('/api/user-projects-count', async (req, res) => {
   }
 });
 
-app.get('/api/tasks/filtered', async (req, res) => {
+app.get("/api/tasks/filtered", async (req, res) => {
   const projectId = req.session.projectId;
 
   try {
-    const importantTasks = await Task.find({ projectId: projectId, status: 'In Progress' });
-    const oldTasks = await Task.find({ projectId: projectId, status: { $in: ['Completed'] } });
+    const importantTasks = await Task.find({
+      projectId: projectId,
+      status: "In Progress",
+    });
+    const oldTasks = await Task.find({
+      projectId: projectId,
+      status: { $in: ["Completed"] },
+    });
 
     res.json({ importantTasks, oldTasks });
   } catch (error) {
@@ -1256,7 +1333,7 @@ app.get("/api/resources-count", async (req, res) => {
     // Find the project and check if the user is either the owner or a collaborator
     const project = await Project.findOne({
       _id: projectId,
-      $or: [{ owner: userId }, { collaborators: userId }] // Check ownership or collaboration
+      $or: [{ owner: userId }, { collaborators: userId }], // Check ownership or collaboration
     });
 
     if (!project) {
@@ -1276,75 +1353,74 @@ app.get("/api/resources-count", async (req, res) => {
   }
 });
 
-
 //project summary
-app.get('/api/taskprojects', async (req, res) => {
+app.get("/api/taskprojects", async (req, res) => {
   try {
-      const projectId = req.session.projectId; // Get the projectId from the session
+    const projectId = req.session.projectId; // Get the projectId from the session
 
-      // Fetch tasks associated with the project
-      const tasks = await Task.find({ projectId: projectId }).populate('owner'); // Populate owner for additional user details if needed
+    // Fetch tasks associated with the project
+    const tasks = await Task.find({ projectId: projectId }).populate("owner"); // Populate owner for additional user details if needed
 
-      // Send the tasks back as a response
-      res.json(tasks);
+    // Send the tasks back as a response
+    res.json(tasks);
   } catch (error) {
-      console.error("Error fetching tasks:", error);
-      res.status(500).json({ message: "Failed to fetch tasks." });
+    console.error("Error fetching tasks:", error);
+    res.status(500).json({ message: "Failed to fetch tasks." });
   }
 });
 
-app.get('/api/managers', async (req, res) => {
+app.get("/api/managers", async (req, res) => {
   try {
-      const projectId = req.session.projectId; // Retrieve projectId from the session
+    const projectId = req.session.projectId; // Retrieve projectId from the session
 
-      if (!projectId) {
-          return res.status(400).json({ message: "Project ID not found in session." });
-      }
+    if (!projectId) {
+      return res
+        .status(400)
+        .json({ message: "Project ID not found in session." });
+    }
 
-      // Find unique assignees from tasks for the given project
-      const assignees = await Task.find({ projectId })
-          .distinct('assignee'); // Get unique assignees
+    // Find unique assignees from tasks for the given project
+    const assignees = await Task.find({ projectId }).distinct("assignee"); // Get unique assignees
 
-      res.json(assignees); // Return the list of assignees
+    res.json(assignees); // Return the list of assignees
   } catch (error) {
-      console.error("Error fetching assignees:", error);
-      res.status(500).json({ message: "Failed to fetch assignees." });
+    console.error("Error fetching assignees:", error);
+    res.status(500).json({ message: "Failed to fetch assignees." });
   }
 });
 
-
-app.get('/api/statuses', (req, res) => {
-  const statuses = ['New', 'Planned', 'In Progress', 'Completed']; // Example statuses
+app.get("/api/statuses", (req, res) => {
+  const statuses = ["New", "Planned", "In Progress", "Completed"]; // Example statuses
   res.json(statuses);
 });
 
-app.get('/api/tasks/assignee/:assignee', async (req, res) => {
+app.get("/api/tasks/assignee/:assignee", async (req, res) => {
   try {
-      const { assignee } = req.params;
-      const projectId = req.session.projectId; // Assuming projectId is stored in session
+    const { assignee } = req.params;
+    const projectId = req.session.projectId; // Assuming projectId is stored in session
 
-      const tasks = await Task.find({ projectId, assignee });
-      res.json(tasks);
+    const tasks = await Task.find({ projectId, assignee });
+    res.json(tasks);
   } catch (error) {
-      console.error("Error fetching tasks by assignee:", error);
-      res.status(500).json({ message: "Failed to fetch tasks." });
+    console.error("Error fetching tasks by assignee:", error);
+    res.status(500).json({ message: "Failed to fetch tasks." });
   }
 });
 
-app.get('/api/tasks/status/:status', async (req, res) => {
+app.get("/api/tasks/status/:status", async (req, res) => {
   try {
-      const { status } = req.params;
-      const projectId = req.session.projectId; // Assuming projectId is stored in session
+    const { status } = req.params;
+    const projectId = req.session.projectId; // Assuming projectId is stored in session
 
-      const tasks = await Task.find({ projectId, status });
-      res.json(tasks);
+    const tasks = await Task.find({ projectId, status });
+    res.json(tasks);
   } catch (error) {
-      console.error("Error fetching tasks by status:", error);
-      res.status(500).json({ message: "Failed to fetch tasks." });
+    console.error("Error fetching tasks by status:", error);
+    res.status(500).json({ message: "Failed to fetch tasks." });
   }
 });
 
-app.get('/api/workload/:projectId', async (req, res) => {
+app.get("/api/workload/:projectId", async (req, res) => {
   const { projectId } = req.params; // Get the project ID from the URL
   const { timeRange } = req.query; // Get the time range from the query parameter
   const currentDate = new Date();
@@ -1352,43 +1428,45 @@ app.get('/api/workload/:projectId', async (req, res) => {
 
   // Determine start date based on the selected time range
   switch (timeRange) {
-      case 'Last 3 months':
-          startDate = new Date(currentDate.setMonth(currentDate.getMonth() - 3));
-          break;
-      case 'Last 6 months':
-          startDate = new Date(currentDate.setMonth(currentDate.getMonth() - 6));
-          break;
-      case 'Last year':
-          startDate = new Date(currentDate.setFullYear(currentDate.getFullYear() - 1));
-          break;
-      default:
-          return res.status(400).json({ message: 'Invalid time range' });
+    case "Last 3 months":
+      startDate = new Date(currentDate.setMonth(currentDate.getMonth() - 3));
+      break;
+    case "Last 6 months":
+      startDate = new Date(currentDate.setMonth(currentDate.getMonth() - 6));
+      break;
+    case "Last year":
+      startDate = new Date(
+        currentDate.setFullYear(currentDate.getFullYear() - 1)
+      );
+      break;
+    default:
+      return res.status(400).json({ message: "Invalid time range" });
   }
 
   try {
-      // Fetch tasks associated with the specified project within the specified time range
-      const tasks = await Task.find({
-          projectId: projectId,
-          createdAt: { $gte: startDate } // Filter tasks created after the start date
-      });
+    // Fetch tasks associated with the specified project within the specified time range
+    const tasks = await Task.find({
+      projectId: projectId,
+      createdAt: { $gte: startDate }, // Filter tasks created after the start date
+    });
 
-      const workloadData = {};
+    const workloadData = {};
 
-      // Count tasks per assignee
-      tasks.forEach(task => {
-          const assignee = task.assignee; // Get the assignee's name
+    // Count tasks per assignee
+    tasks.forEach((task) => {
+      const assignee = task.assignee; // Get the assignee's name
 
-          if (!workloadData[assignee]) {
-              workloadData[assignee] = 0; // Initialize if not already present
-          }
+      if (!workloadData[assignee]) {
+        workloadData[assignee] = 0; // Initialize if not already present
+      }
 
-          workloadData[assignee]++; // Increment count for this assignee
-      });
+      workloadData[assignee]++; // Increment count for this assignee
+    });
 
-      res.json(workloadData); // Send the workload data back as a response
+    res.json(workloadData); // Send the workload data back as a response
   } catch (error) {
-      console.error("Error fetching workload data:", error);
-      res.status(500).json({ message: "Failed to fetch workload data." });
+    console.error("Error fetching workload data:", error);
+    res.status(500).json({ message: "Failed to fetch workload data." });
   }
 });
 

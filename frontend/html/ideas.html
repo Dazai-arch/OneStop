@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OneSTOP Dashboard</title>
+    <link rel="stylesheet" href="/css/resources.css">
+    <style>
+        
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #ffffff;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .contner {
+            width: 80%;
+            margin: 50px auto;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: #444;
+            width: fit-content;
+        }
+        
+        .search-bar {
+            margin-bottom: 20px;
+        }
+        
+        .search-bar input {
+            width: 50%;
+            padding: 10px;
+            font-size: 16px;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        
+        .ideas-list {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            max-height: 550px;
+            overflow-y: auto;
+        }
+        .ideas-list::-webkit-scrollbar {
+            width: 4px; /* Adjust the width of the scrollbar */
+          }
+          
+          .ideas-list::-webkit-scrollbar-thumb {
+            background-color: rgba(0, 0, 0, 0.5); /* Customize scrollbar thumb */
+            border-radius: 10px; /* Rounded corners */
+          }
+          
+          .ideas-list::-webkit-scrollbar-track {
+            background: transparent; /* Hide the track */
+          }
+          
+          .ideas-list::-webkit-scrollbar-button {
+            display: none; /* This hides the arrows */
+          }
+        
+        .idea-card {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            width: 250px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: box-shadow 0.3s ease;
+            text-align: left;
+        }
+        
+        .idea-card:hover {
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+        
+        .idea-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .idea-card p {
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+        }
+        
+        #no-results {
+            color: #888;
+            font-size: 1.2rem;
+        }
+        
+.popup {
+display: none; /* Hidden by default */
+position: fixed; 
+z-index: 1; 
+left: 0;
+top: 0;
+width: 100%; 
+height: 100%;
+background-color: rgba(0, 0, 0, 0.4);
+backdrop-filter: blur(5px);
+}
+
+.popup-content {
+background-color: white;
+margin: 15% auto; 
+padding: 20px;
+border: 1px solid #888;
+width: 30%;
+text-align: center;
+}
+
+.close {
+color: #aaa;
+float: right;
+font-size: 28px;
+font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+color: black;
+cursor: pointer;
+}
+.noselect{
+background-color: #000000;
+}
+
+input[type="text"] {
+width: 90%;
+padding: 10px;
+margin-bottom: 20px;
+border: 1px solid #ccc;
+border-radius: 5px;
+font-size: 16px;
+}
+.addb {
+background-color: #4f504f;
+color: white;
+padding: 10px 20px;
+font-size: 16px;
+border-radius: 5px;
+cursor: pointer;
+transition: background-color 0.3s ease;
+margin-top: 10px;
+}
+
+.addb:hover {
+background-color: #fdfffe;
+}
+
+        
+    </style>
+
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo"><img src="/OneSTOPlogo.png"></div>
+        
+        <button class="noselect" onclick="openPopup()">
+            <span class="text">Add</span>
+            <span class="icon"><span class="buttonSpan">+</span></span>
+        </button>
+
+        <div id="projectPopup" class="popup">
+            <div class="popup-content">
+                <span class="close" onclick="closePopup()">&times;</span>
+                <h2>Add New Project</h2>
+                <input type="text" id="newProjectName" placeholder="Enter Project Name">
+                <div class="addb" onclick="addProject()">Add Project</div>
+            </div>
+        </div>
+        
+        <button class="login-signup-btn" id="logout-btn">Log Out</button>
+        
+        <ul class="menu">
+            <li>
+                <img src="/dashboardpng.png" alt="Dashboard Icon" class="menu-icon">
+                <span><a href="/html/dashboard.html">Dashboard</a></span>
+            </li>
+            <li>
+                <img src="/projectspng.png" alt="Projects Icon" class="menu-icon">
+                <span><a href="/html/project.html">Projects</a></span>
+            </li>
+            <li>
+                <img src="/taskpng.png" alt="Tasks Icon" class="menu-icon">
+                <span><a href="/html/tasks.html">Tasks</a></span>
+            </li>
+            <li>
+                <img src="/ideaspng.png" alt="Ideas Icon" class="menu-icon">
+                <span><a href="#">Ideas</a></span>
+            </li>
+            <li>
+                <img src="/collaboratorpng.png" alt="Collaborators Icon" class="menu-icon">
+                <span><a href="/html/collaborator.html">Collaborators</a></span>
+            </li>
+
+            <a href="/html/about.html"><img src="/image 11.png" alt="Bottom Image" class="bottom-image"></a>
+        </ul>
+    </div>
+    
+    <div class="main-content">
+           
+    
+            <main>
+              <div class="container">
+                <div class="team-tag">
+                    <div class="details">
+                        <h4 id="username"></h4>
+                        <p id="designation"></p>
+                    </div>
+                    <div class="avatar"><a href="/html/proffile.html">
+                        <img src="" alt="" id="profileimage"></a>
+                    </div>
+                </div>
+                <h1>Ideas</h1>
+                <div class="search-bar">
+                    <input type="text" id="search-input" placeholder="Search for Project Ideas..." autofocus>
+                </div>
+                <div id="ideas-list" class="ideas-list"></div>
+                <p id="no-results" style="display:none;">No ideas found. Try a different search term.</p>
+            </div>
+        </main>
+        <script src="/js/addotherpage.js"></script>
+        <script>
+            // Function to fetch and load CSV data
+            async function loadCSVData() {
+                try {
+                    const response = await fetch('/updated_project_ideas_with_genre.csv');
+            
+                    if (!response.ok) {
+                        throw new Error(`Error fetching CSV: ${response.statusText}`);
+                    }
+            
+                    const csvData = await response.text();
+                    console.log(csvData);
+                    return parseCSV(csvData);
+                } catch (error) {
+                    console.error('Error loading CSV:', error);
+                }
+            }
+            
+            function parseCSV(data) {
+                const lines = data.trim().split('\n').slice(1); // Remove header row
+                return lines.map(line => {
+                    // Split using comma and handle quotes correctly
+                    const [name, description, techStack, genre] = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/); 
+                    const projectIdea = { 
+                        name: name.trim(), 
+                        genre: genre.trim(), 
+                        techStack: techStack.trim(), 
+                        description: description.trim() 
+                    };// Debugging statement to check values
+                    return projectIdea;
+                });
+            }
+            
+            
+            function displayIdeas(ideas) {
+                const ideasList = document.getElementById('ideas-list');
+                ideasList.innerHTML = ''; // Clear existing ideas
+                const noResultsMessage = document.getElementById('no-results');
+            
+                if (ideas.length === 0) {
+                    noResultsMessage.style.display = 'block'; // Show no results message
+                } else {
+                    noResultsMessage.style.display = 'none'; // Hide no results message
+                    ideas.forEach(idea => {
+                        const ideaCard = document.createElement('div');
+                        ideaCard.className = 'idea-card';
+                        ideaCard.innerHTML = `
+                            <h3>${idea.name}</h3>
+                            <p><strong>Genre:</strong> ${idea.genre}</p>
+                            <p><strong>Description:</strong> ${idea.description}</p>
+                            <p><strong>Tech Stack:</strong> ${idea.techStack}</p> <!-- Updated to techStack -->
+                        `;
+                        ideasList.appendChild(ideaCard);
+                    });
+                }
+            }
+            
+            function filterIdeas(ideas, query) {
+                return ideas.filter(idea =>
+                    idea.name.toLowerCase().includes(query.toLowerCase()) ||
+                    idea.genre.toLowerCase().includes(query.toLowerCase()) ||
+                    idea.description.toLowerCase().includes(query.toLowerCase()) ||
+                    idea.techStack.toLowerCase().includes(query.toLowerCase()) // Updated from tools to techStack
+                );
+            }
+            
+            document.addEventListener('DOMContentLoaded', async () => {
+                const projectIdeas = await loadCSVData(); // Load CSV data and parse
+                displayIdeas(projectIdeas); // Initially display all ideas
+            
+                // Search functionality
+                const searchInput = document.getElementById('search-input');
+                searchInput.addEventListener('input', () => {
+                    const query = searchInput.value.trim();
+                    const filteredIdeas = filterIdeas(projectIdeas, query); // Filter based on input
+                    displayIdeas(filteredIdeas); // Display filtered ideas
+                });
+            
+            
+
+                fetch('/api/get-selected-project')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    //fetchTasksForProject(data.projectId);
+                } else {
+                    alert('No project selected.');
+                    window.location.href = '/html/project.html';
+                }
+            })
+            .catch(error => console.error('Error fetching selected project:', error));
+        });
+        document.addEventListener('DOMContentLoaded', () => {
+
+            fetch('/profile')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('username').textContent = data.username;
+                document.getElementById('designation').textContent = data.designation;
+                document.getElementById('profileimage').src = data.image;
+            })
+            .catch(error => console.error('Error fetching profile data:', error));
+
+            });
+
+            document.getElementById("logout-btn").addEventListener("click", function () {
+                fetch('/logout', {
+                    method: 'POST', // Send a POST request for logout
+                    credentials: 'include', // Include cookies (session info)
+                })
+                .then((response) => {
+                    if (response.ok) {
+                        // Redirect to the home page on successful logout
+                        window.location.href = '/html/home.html';
+                    } else {
+                        alert("Failed to log out. Please try again.");
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error logging out:', error);
+                });
+            });
+        </script>
+        </body>
+        </html>
+        
