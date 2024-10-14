@@ -9,10 +9,13 @@ document.querySelectorAll(".section img").forEach((img) => {
     document
       .querySelectorAll(".section img")
       .forEach((i) => i.classList.remove("selected"));
+
     // Add the 'selected' class to the clicked image
     this.classList.add("selected");
-    // Store the image path
-    selectedImagePath = this.src; // Store the selected image's URL
+
+    // Extract and store only the image path (without the domain)
+    const imagePath = new URL(this.src).pathname;
+    selectedImagePath = imagePath; // Store only the relative path, e.g., "/shieldprofileimage.png"
   });
 });
 
