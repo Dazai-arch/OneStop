@@ -291,8 +291,10 @@ function generateTable(tasks) {
         dueDateCell.textContent = formattedDate;
 
         // Check if the due date is before today and style accordingly
-        if (task.dueDate && new Date(task.dueDate) < today) {
-            dueDateCell.style.color = 'red'; // Change text color to red if past due date
+        if (task.status === 'Completed') {
+            dueDateCell.style.color = 'green'; // Green for completed tasks
+        } else if (task.dueDate && new Date(task.dueDate) < today) {
+            dueDateCell.style.color = 'red'; // Red if past due date and not completed
         }
         row.appendChild(dueDateCell);
 
