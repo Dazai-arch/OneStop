@@ -245,7 +245,11 @@
                     
                     // Update the task's status based on the new column (the ID of the column is the new status)
                     const newStatus = this.id; // 'new', 'planned', 'in-progress', or 'completed'
-                    updateTaskStatus(taskId, newStatus); // Call function to update the task's status in the backend
+                    const formattedStatus = statusMapping[newStatus];
+                    const currentStatus = taskElement.dataset.status; // Store current status on task element
+        if (currentStatus !== formattedStatus) {
+            updateTaskStatus(taskId, formattedStatus); // Update the task's status in the backend
+        } // Call function to update the task's status in the backend
                 }
             }
             
